@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Club de Golf d'Oka — Maquette</title>
+<style>
+  :root{
+    --forest-deep:#14261C;
+    --forest:#1E3B2C;
+    --forest-light:#3E624A;
+    --lake:#3C6E8F;
+    --lake-light:#8FB9CC;
+    --sand:#C7A768;
+    --sand-light:#E4D5A8;
+    --paper:#F3EFE1;
+    --paper-dark:#E8E0C8;
+    --ink:#20241C;
+    --ink-soft:#4B5245;
+    --brass:#9C6B26;
+    --white:#FFFFFF;
+    --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Times New Roman', serif;
+    --sans: 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:var(--sans);
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4{font-family:var(--serif);font-weight:600;margin:0 0 .4em;color:var(--forest-deep);}
+  p{margin:0 0 1em;color:var(--ink-soft);max-width:62ch;}
+  a{color:inherit;}
+  button{font-family:var(--sans);cursor:pointer;border:none;}
+  img,svg{display:block;max-width:100%;}
+  ::selection{background:var(--sand-light);}
+
+  /* Preview badge */
+  .preview-badge{
+    position:fixed;bottom:14px;right:14px;z-index:999;
+    background:var(--forest-deep);color:var(--paper);
+    font-size:.72rem;letter-spacing:.02em;
+    padding:8px 12px;border-radius:3px;
+    box-shadow:0 4px 14px rgba(0,0,0,.25);
+    font-family:var(--sans);opacity:.92;
+  }
+
+  /* Header */
+  header{
+    position:sticky;top:0;z-index:100;
+    background:var(--forest-deep);
+    color:var(--paper);
+    padding:0 5vw;
+  }
+  .nav-inner{
+    display:flex;align-items:center;justify-content:space-between;
+    max-width:1200px;margin:0 auto;height:72px;
+  }
+  .logo{
+    font-family:var(--serif);font-size:1.32rem;letter-spacing:.01em;
+    display:flex;flex-direction:column;line-height:1.05;cursor:pointer;
+  }
+  .logo span{font-family:var(--sans);font-size:.62rem;color:var(--sand-light);letter-spacing:.06em;margin-top:2px;}
+  nav.links{display:flex;gap:2px;align-items:center;}
+  nav.links button{
+    background:transparent;color:var(--paper);
+    padding:10px 14px;font-size:.92rem;border-radius:3px;
+    transition:background .15s;
+  }
+  nav.links button:hover{background:rgba(255,255,255,.08);}
+  nav.links button.active{background:var(--forest);color:var(--sand-light);}
+  .book-cta{
+    background:var(--brass) !important;color:var(--white) !important;
+    padding:10px 18px !important;border-radius:3px;font-weight:600;
+    margin-left:6px;
+  }
+  .book-cta:hover{background:#875c1f !important;}
+  .lang-toggle{
+    display:flex;border:1px solid rgba(255,255,255,.3);border-radius:20px;overflow:hidden;margin-left:14px;
+  }
+  .lang-toggle button{
+    background:transparent;color:var(--paper);padding:6px 12px;font-size:.74rem;font-weight:600;
+  }
+  .lang-toggle button.active{background:var(--sand);color:var(--forest-deep);}
+  .burger{display:none;background:transparent;color:var(--paper);font-size:1.4rem;padding:6px 10px;}
+
+  @media(max-width:920px){
+    nav.links{display:none;position:absolute;top:72px;left:0;right:0;background:var(--forest-deep);flex-direction:column;padding:8px 5vw 18px;}
+    nav.links.open{display:flex;}
+    nav.links button{text-align:left;width:100%;}
+    .burger{display:block;}
+  }
+
+  main{max-width:1200px;margin:0 auto;padding:0 5vw;}
+  section.page{display:none;padding:64px 0 40px;}
+  section.page.active{display:block;}
+
+  /* HERO */
+  .hero-wrap{position:relative;background:var(--forest-deep);overflow:hidden;}
+  .hero-inner{
+    position:relative;z-index:3;max-width:1200px;margin:0 auto;
+    padding:100px 5vw 0;color:var(--paper);
+  }
+  .hero-inner .eyebrow{color:var(--sand-light);font-size:.86rem;margin-bottom:10px;}
+  .hero-inner h1{
+    font-size:clamp(2.2rem,5vw,3.6rem);color:var(--white);max-width:11ch;
+    line-height:1.05;margin-bottom:.5em;
+  }
+  .hero-inner p.lead{color:var(--paper-dark);font-size:1.08rem;max-width:46ch;}
+  .hero-cta-row{display:flex;gap:12px;margin:28px 0 0;flex-wrap:wrap;}
+  .btn{
+    padding:13px 24px;border-radius:3px;font-size:.95rem;font-weight:600;
+    display:inline-block;transition:transform .12s, background .15s;
+  }
+  .btn:hover{transform:translateY(-1px);}
+  .btn-brass{background:var(--brass);color:var(--white);}
+  .btn-brass:hover{background:#875c1f;}
+  .btn-outline{background:transparent;color:var(--paper);border:1px solid rgba(255,255,255,.45);}
+  .btn-outline:hover{border-color:var(--white);}
+
+  .hero-scene{width:100%;height:340px;margin-top:56px;position:relative;}
+  .stat-row{
+    position:relative;z-index:3;display:flex;gap:0;flex-wrap:wrap;
+    border-top:1px solid rgba(255,255,255,.18);margin-top:-2px;
+  }
+  .stat{padding:22px 32px 30px 0;color:var(--paper);flex:1;min-width:150px;}
+  .stat b{display:block;font-family:var(--serif);font-size:1.7rem;color:var(--sand-light);}
+  .stat span{font-size:.82rem;color:var(--paper-dark);}
+
+  /* Intro / features */
+  .intro{padding:70px 0 30px;display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:start;}
+  @media(max-width:800px){.intro{grid-template-columns:1fr;}}
+  .intro h2{font-size:2rem;max-width:16ch;}
+  .feature-list{display:flex;flex-direction:column;gap:0;}
+  .feature{padding:20px 0;border-top:1px solid var(--paper-dark);}
+  .feature:last-child{border-bottom:1px solid var(--paper-dark);}
+  .feature h4{font-size:1.05rem;margin-bottom:.3em;color:var(--forest);}
+  .feature p{font-size:.92rem;margin:0;}
+
+  .band{background:var(--forest);color:var(--paper);padding:54px 5vw;margin:64px calc(-5vw) 0;}
+  .band-inner{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;}
+  .band h3{color:var(--white);margin-bottom:.2em;}
+  .band p{color:var(--paper-dark);margin:0;}
+
+  /* Section headers */
+  .section-head{margin-bottom:34px;}
+  .section-head .kicker{color:var(--brass);font-size:.85rem;font-weight:600;margin-bottom:6px;}
+  .section-head h2{font-size:1.9rem;max-width:24ch;}
+
+  /* Pricing table */
+  .price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:50px;}
+  @media(max-width:800px){.price-grid{grid-template-columns:1fr;}}
+  .price-card{border:1px solid var(--paper-dark);background:var(--white);padding:26px 22px;border-radius:4px;}
+  .price-card h4{font-size:1rem;color:var(--forest);border-bottom:2px solid var(--sand);display:inline-block;padding-bottom:4px;margin-bottom:14px;}
+  .price-line{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px dashed var(--paper-dark);font-size:.92rem;}
+  .price-line:last-child{border-bottom:none;}
+  .price-line b{color:var(--forest-deep);}
+
+  /* Booking widget */
+  .booking-widget{border:1px solid var(--paper-dark);background:var(--white);border-radius:6px;padding:30px;margin-bottom:60px;}
+  .bw-row{display:grid;grid-template-columns:220px 1fr 260px;gap:28px;}
+  @media(max-width:960px){.bw-row{grid-template-columns:1fr;}}
+  .bw-field label{display:block;font-size:.78rem;color:var(--ink-soft);margin-bottom:6px;font-weight:600;}
+  .bw-field input,.bw-field select{
+    width:100%;padding:10px 12px;border:1px solid var(--paper-dark);border-radius:3px;
+    font-size:.94rem;font-family:var(--sans);background:var(--paper);color:var(--ink);
+  }
+  .bw-field{margin-bottom:16px;}
+  .slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px;margin-top:6px;}
+  .slot{
+    padding:10px 6px;text-align:center;border:1px solid var(--paper-dark);border-radius:3px;
+    font-size:.86rem;background:var(--paper);color:var(--ink);
+  }
+  .slot.taken{color:#b7b0a0;background:#EEE9DA;text-decoration:line-through;cursor:not-allowed;}
+  .slot.selected{background:var(--forest);color:var(--white);border-color:var(--forest);}
+  .slot:not(.taken):hover{border-color:var(--brass);}
+
+  .cart-box{background:var(--paper-dark);border-radius:4px;padding:20px;}
+  .cart-box h4{font-size:.95rem;margin-bottom:12px;}
+  .cart-line{display:flex;justify-content:space-between;font-size:.86rem;padding:6px 0;color:var(--ink-soft);}
+  .cart-total{display:flex;justify-content:space-between;font-weight:700;border-top:1px solid #d7cfae;margin-top:8px;padding-top:10px;color:var(--forest-deep);}
+  .cart-empty{font-size:.86rem;color:var(--ink-soft);font-style:italic;}
+  .cart-box button{width:100%;margin-top:14px;padding:12px;border-radius:3px;background:var(--brass);color:var(--white);font-weight:600;}
+  .cart-box button:disabled{background:#cbbfa0;cursor:not-allowed;}
+
+  /* Gallery */
+  .gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;}
+  @media(max-width:760px){.gallery-grid{grid-template-columns:repeat(2,1fr);}}
+  .gph{border-radius:4px;height:190px;position:relative;overflow:hidden;display:flex;align-items:flex-end;padding:14px;}
+  .gph span{color:var(--white);font-size:.82rem;font-weight:600;text-shadow:0 1px 4px rgba(0,0,0,.4);}
+
+  /* Tournaments */
+  .event-row{display:flex;justify-content:space-between;align-items:center;padding:22px 0;border-top:1px solid var(--paper-dark);gap:18px;flex-wrap:wrap;}
+  .event-row:last-child{border-bottom:1px solid var(--paper-dark);}
+  .event-date{font-family:var(--serif);color:var(--forest);min-width:120px;}
+  .event-date b{display:block;font-size:1.4rem;}
+  .event-info h4{margin-bottom:.2em;font-size:1.05rem;}
+  .event-info p{margin:0;font-size:.86rem;}
+  .event-meta{flex:1;}
+
+  /* Forms */
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:640px;}
+  @media(max-width:640px){.form-grid{grid-template-columns:1fr;}}
+  .form-grid .full{grid-column:1/-1;}
+  .form-grid label{display:block;font-size:.8rem;font-weight:600;margin-bottom:6px;color:var(--ink-soft);}
+  .form-grid input,.form-grid textarea{
+    width:100%;padding:11px 12px;border:1px solid var(--paper-dark);border-radius:3px;
+    font-family:var(--sans);font-size:.94rem;background:var(--white);
+  }
+  .form-grid textarea{min-height:100px;resize:vertical;}
+  .success-box{background:#E7EFE4;border:1px solid var(--forest-light);color:var(--forest-deep);padding:18px 20px;border-radius:4px;font-size:.92rem;display:none;}
+
+  /* Contact */
+  .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;}
+  @media(max-width:800px){.contact-grid{grid-template-columns:1fr;}}
+  .contact-item{padding:14px 0;border-top:1px solid var(--paper-dark);}
+  .contact-item b{display:block;font-size:.78rem;text-transform:none;color:var(--brass);margin-bottom:3px;}
+
+  /* Footer */
+  footer{background:var(--forest-deep);color:var(--paper-dark);margin-top:70px;padding:44px 5vw 26px;}
+  .footer-inner{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:24px;}
+  .footer-inner .logo{color:var(--paper);}
+  footer .fine{font-size:.78rem;color:#8a9186;margin-top:30px;border-top:1px solid rgba(255,255,255,.1);padding-top:18px;}
+
+  /* Modal */
+  .modal-bg{
+    position:fixed;inset:0;background:rgba(20,38,28,.55);z-index:200;
+    display:none;align-items:center;justify-content:center;padding:20px;
+  }
+  .modal-bg.open{display:flex;}
+  .modal{background:var(--white);border-radius:6px;max-width:440px;width:100%;padding:30px;position:relative;}
+  .modal-close{position:absolute;top:14px;right:16px;background:transparent;font-size:1.3rem;color:var(--ink-soft);}
+  .modal h3{margin-bottom:6px;}
+  .modal .note{font-size:.78rem;color:var(--ink-soft);margin-bottom:18px;}
+  .modal label{display:block;font-size:.8rem;font-weight:600;margin:12px 0 6px;color:var(--ink-soft);}
+  .modal input{width:100%;padding:11px 12px;border:1px solid var(--paper-dark);border-radius:3px;font-family:var(--sans);}
+  .card-row{display:flex;gap:10px;}
+  .modal button.pay{width:100%;margin-top:20px;padding:13px;border-radius:3px;background:var(--brass);color:var(--white);font-weight:700;font-size:.98rem;}
+  .paying{text-align:center;padding:20px 0;}
+  .spinner{width:34px;height:34px;border:3px solid var(--paper-dark);border-top-color:var(--brass);border-radius:50%;margin:0 auto 16px;animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .confirm-box{text-align:center;padding:10px 0;}
+  .confirm-box .check{width:52px;height:52px;border-radius:50%;background:var(--forest);color:var(--white);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:1.5rem;}
+  .confirm-code{font-family:var(--serif);font-size:1.2rem;color:var(--forest-deep);margin:10px 0;letter-spacing:.05em;}
+</style>
+</head>
+<body>
+
+<div class="preview-badge" data-i18n="badge">Aperçu de conception — démonstration, sans transactions réelles</div>
+
+<header>
+  <div class="nav-inner">
+    <div class="logo" onclick="goTo('home')">Golf d'Oka
+      <span data-i18n="since">CLUB ÉTABLI EN 1960</span>
+    </div>
+    <button class="burger" onclick="document.querySelector('nav.links').classList.toggle('open')">☰</button>
+    <nav class="links">
+      <button data-page="home" onclick="goTo('home')" data-i18n="nav_home">Accueil</button>
+      <button data-page="book" onclick="goTo('book')" data-i18n="nav_book">Tarifs &amp; réservation</button>
+      <button data-page="events" onclick="goTo('events')" data-i18n="nav_events">Tournois</button>
+      <button data-page="wedding" onclick="goTo('wedding')" data-i18n="nav_wedding">Mariages</button>
+      <button data-page="gallery" onclick="goTo('gallery')" data-i18n="nav_gallery">Galerie</button>
+      <button data-page="contact" onclick="goTo('contact')" data-i18n="nav_contact">Contact</button>
+      <button class="book-cta" onclick="goTo('book')" data-i18n="nav_cta">Réserver un départ</button>
+      <div class="lang-toggle">
+        <button id="langFr" class="active" onclick="setLang('fr')">FR</button>
+        <button id="langEn" onclick="setLang('en')">EN</button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<!-- HOME -->
+<div class="hero-wrap">
+  <div class="hero-inner">
+    <div class="eyebrow" data-i18n="hero_eyebrow">OKA, QUÉBEC — LE LONG DU LAC DES DEUX MONTAGNES</div>
+    <h1 data-i18n="hero_title">Un des plus beaux 9 trous du Québec</h1>
+    <p class="lead" data-i18n="hero_lead">Un parcours normale 36 tracé parmi des pins centenaires, construit sur base de sable — l'eau n'y est jamais un problème. Une expérience différente, du premier au neuvième trou.</p>
+    <div class="hero-cta-row">
+      <a class="btn btn-brass" onclick="goTo('book')" data-i18n="hero_cta1">Voir les tarifs et réserver</a>
+      <a class="btn btn-outline" onclick="goTo('wedding')" data-i18n="hero_cta2">Organiser un événement</a>
+    </div>
+  </div>
+  <svg class="hero-scene" viewBox="0 0 1200 340" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#14261C"/>
+        <stop offset="1" stop-color="#1E3B2C"/>
+      </linearGradient>
+      <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#3C6E8F"/>
+        <stop offset="1" stop-color="#2A4E64"/>
+      </linearGradient>
+    </defs>
+    <rect width="1200" height="340" fill="url(#sky)"/>
+    <circle cx="1015" cy="90" r="46" fill="#C7A768" opacity="0.85"/>
+    <g opacity="0.5" fill="#2E4E3A">
+      <polygon points="60,260 100,120 140,260"/>
+      <polygon points="130,260 175,90 220,260"/>
+      <polygon points="205,260 245,150 285,260"/>
+      <polygon points="950,260 995,110 1040,260"/>
+      <polygon points="1030,260 1075,140 1120,260"/>
+      <polygon points="1100,260 1140,170 1180,260"/>
+    </g>
+    <g opacity="0.75" fill="#22422F">
+      <polygon points="0,260 55,95 110,260"/>
+      <polygon points="85,260 140,60 195,260"/>
+      <polygon points="880,260 935,80 990,260"/>
+      <polygon points="970,260 1030,50 1090,260"/>
+      <polygon points="1070,260 1130,110 1190,260"/>
+    </g>
+    <rect y="258" width="1200" height="82" fill="url(#water)"/>
+    <path d="M0,258 Q150,248 300,258 T600,258 T900,258 T1200,258 V262 H0 Z" fill="#8FB9CC" opacity="0.3"/>
+  </svg>
+  <div class="stat-row">
+    <div class="stat"><b>1960</b><span data-i18n="stat1">Année de fondation</span></div>
+    <div class="stat"><b>36</b><span data-i18n="stat2">Normale du parcours</span></div>
+    <div class="stat"><b>2 848 vg</b><span data-i18n="stat3">Longueur du parcours</span></div>
+    <div class="stat"><b>100</b><span data-i18n="stat4">Places au chalet pour événements</span></div>
+  </div>
+</div>
+
+<main>
+<section class="page active" id="page-home">
+  <div class="intro">
+    <div>
+      <h2 data-i18n="intro_title">Toute une expérience, trou après trou</h2>
+      <p data-i18n="intro_p1">Considéré comme l'un des plus beaux 9 trous du Québec, le Club de golf d'Oka offre un paysage extraordinaire de pins centenaires en bordure du lac des Deux Montagnes. Le parcours, construit sur une base de sable, évacue naturellement l'eau — jouable même après la pluie.</p>
+      <p data-i18n="intro_p2">Le chalet accueille jusqu'à 100 personnes pour vos tournois, mariages ou réceptions. La terrasse, avec vue sur le lac, est l'endroit tout indiqué pour prolonger la journée.</p>
+      <a class="btn btn-brass" onclick="goTo('book')" data-i18n="intro_cta" style="margin-top:6px;">Consulter les tarifs</a>
+    </div>
+    <div class="feature-list">
+      <div class="feature">
+        <h4 data-i18n="f1_h">Parcours normale 36</h4>
+        <p data-i18n="f1_p">9 trous jouables par des golfeurs de tous niveaux, sur un terrain sablonneux qui draine naturellement.</p>
+      </div>
+      <div class="feature">
+        <h4 data-i18n="f2_h">Chalet &amp; terrasse</h4>
+        <p data-i18n="f2_p">Salle pour groupes jusqu'à 100 personnes, casse-croûte, boutique et terrasse avec vue sur le lac.</p>
+      </div>
+      <div class="feature">
+        <h4 data-i18n="f3_h">Ligues &amp; tournois</h4>
+        <p data-i18n="f3_p">Ligues les mardis et jeudis soir dès 18h, et tournois corporatifs ou privés toute la saison.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="band-inner">
+      <div>
+        <h3 data-i18n="band_h">Saison 2026 : du 1er mai au 31 octobre</h3>
+        <p data-i18n="band_p">Réservez votre départ en quelques clics — plus besoin d'attendre l'ouverture du secrétariat.</p>
+      </div>
+      <a class="btn btn-brass" onclick="goTo('book')" data-i18n="band_cta">Réserver maintenant</a>
+    </div>
+  </div>
+</section>
+
+<!-- BOOK / TARIFS -->
+<section class="page" id="page-book">
+  <div class="section-head">
+    <div class="kicker" data-i18n="book_kicker">TARIFICATION 2026 — TAXES EN SUS</div>
+    <h2 data-i18n="book_h">Tarifs et réservation en ligne</h2>
+  </div>
+
+  <div class="price-grid">
+    <div class="price-card">
+      <h4 data-i18n="pc1_h">Droits de jeu</h4>
+      <div class="price-line"><span data-i18n="pc1_l1">9 trous — semaine</span><b>28 $</b></div>
+      <div class="price-line"><span data-i18n="pc1_l2">9 trous — fin de semaine</span><b>30 $</b></div>
+      <div class="price-line"><span data-i18n="pc1_l3">18 trous — semaine</span><b>36 $</b></div>
+      <div class="price-line"><span data-i18n="pc1_l4">18 trous — fin de semaine</span><b>40 $</b></div>
+      <div class="price-line"><span data-i18n="pc1_l5">Après 15h (9 trous)</span><b>20–22 $</b></div>
+    </div>
+    <div class="price-card">
+      <h4 data-i18n="pc2_h">Blocs de 10 parties</h4>
+      <div class="price-line"><span data-i18n="pc2_l1">10 parties de 9 trous</span><b>260 $</b></div>
+      <div class="price-line"><span data-i18n="pc2_l2">10 parties de 18 trous</span><b>330 $</b></div>
+      <div class="price-line"><span data-i18n="pc2_l3">Aucune date d'expiration</span><b>—</b></div>
+      <div class="price-line"><span data-i18n="pc2_l4">Voiturette (9 trous)</span><b>14–15 $</b></div>
+      <div class="price-line"><span data-i18n="pc2_l5">Voiturette (18 trous)</span><b>18–20 $</b></div>
+    </div>
+    <div class="price-card">
+      <h4 data-i18n="pc3_h">Abonnements annuels</h4>
+      <div class="price-line"><span data-i18n="pc3_l1">Individuel 7 jours</span><b>1 250 $</b></div>
+      <div class="price-line"><span data-i18n="pc3_l2">Individuel 5 jours</span><b>1 200 $</b></div>
+      <div class="price-line"><span data-i18n="pc3_l3">5 jours après 15h</span><b>650 $</b></div>
+      <div class="price-line"><span data-i18n="pc3_l4">Early Bird (avant 8h)</span><b>500 $</b></div>
+      <div class="price-line"><span data-i18n="pc3_l5" style="font-style:italic;">Casier et entreposage inclus</span><b>—</b></div>
+    </div>
+  </div>
+
+  <div class="section-head">
+    <div class="kicker" data-i18n="bw_kicker">DÉMONSTRATION</div>
+    <h2 data-i18n="bw_h">Réservez votre départ</h2>
+  </div>
+  <div class="booking-widget">
+    <div class="bw-row">
+      <div>
+        <div class="bw-field">
+          <label data-i18n="bw_date">Date</label>
+          <input type="date" id="bwDate">
+        </div>
+        <div class="bw-field">
+          <label data-i18n="bw_players">Nombre de joueurs</label>
+          <select id="bwPlayers">
+            <option>1</option><option selected>2</option><option>3</option><option>4</option>
+          </select>
+        </div>
+        <div class="bw-field">
+          <label data-i18n="bw_holes">Parcours</label>
+          <select id="bwHoles">
+            <option value="28">9 trous — 28 $</option>
+            <option value="36">18 trous — 36 $</option>
+          </select>
+        </div>
+        <div class="bw-field">
+          <label style="display:flex;align-items:center;gap:8px;font-weight:600;font-size:.85rem;color:var(--ink-soft);">
+            <input type="checkbox" id="bwCart" style="width:auto;"> <span data-i18n="bw_cart">Ajouter voiturette électrique (+14 $/pers.)</span>
+          </label>
+        </div>
+      </div>
+      <div>
+        <label style="display:block;font-size:.78rem;font-weight:600;color:var(--ink-soft);margin-bottom:8px;" data-i18n="bw_slots">Heures de départ disponibles</label>
+        <div class="slots" id="slotGrid"></div>
+      </div>
+      <div class="cart-box">
+        <h4 data-i18n="bw_summary">Résumé de la réservation</h4>
+        <div id="cartLines"><div class="cart-empty" data-i18n="bw_empty">Sélectionnez une heure de départ.</div></div>
+        <button id="checkoutBtn" disabled onclick="openPayModal('booking')" data-i18n="bw_pay">Procéder au paiement</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EVENTS -->
+<section class="page" id="page-events">
+  <div class="section-head">
+    <div class="kicker" data-i18n="ev_kicker">LIGUES &amp; TOURNOIS</div>
+    <h2 data-i18n="ev_h">Activités de la saison 2026</h2>
+    <p data-i18n="ev_p">Ligues du mardi et du jeudi dès 18h, tournois corporatifs et compétitions amicales. Inscription en ligne — démonstration.</p>
+  </div>
+  <div id="eventList"></div>
+</section>
+
+<!-- WEDDING -->
+<section class="page" id="page-wedding">
+  <div class="section-head">
+    <div class="kicker" data-i18n="w_kicker">CHALET &amp; TERRASSE</div>
+    <h2 data-i18n="w_h">Mariages et réceptions</h2>
+    <p data-i18n="w_p">Notre chalet accueille jusqu'à 100 personnes, avec une terrasse donnant sur le lac des Deux Montagnes — un cadre naturel pour votre réception.</p>
+  </div>
+  <div class="price-grid">
+    <div class="price-card">
+      <h4 data-i18n="wp1_h">Forfait Terrasse</h4>
+      <p style="font-size:.85rem;" data-i18n="wp1_p">Cocktail en terrasse avec vue sur le lac, jusqu'à 60 invités.</p>
+    </div>
+    <div class="price-card">
+      <h4 data-i18n="wp2_h">Forfait Chalet complet</h4>
+      <p style="font-size:.85rem;" data-i18n="wp2_p">Location exclusive du chalet et de la terrasse, jusqu'à 100 invités.</p>
+    </div>
+    <div class="price-card">
+      <h4 data-i18n="wp3_h">Forfait Tournoi + Réception</h4>
+      <p style="font-size:.85rem;" data-i18n="wp3_p">Avant-midi de golf suivi d'une réception — idéal pour les groupes corporatifs.</p>
+    </div>
+  </div>
+
+  <div class="section-head"><h2 data-i18n="w_form_h" style="font-size:1.4rem;">Demander une soumission</h2></div>
+  <form class="form-grid" onsubmit="submitForm(event,'weddingSuccess')">
+    <div><label data-i18n="w_f_name">Nom complet</label><input required></div>
+    <div><label data-i18n="w_f_email">Courriel</label><input type="email" required></div>
+    <div><label data-i18n="w_f_date">Date souhaitée</label><input type="date"></div>
+    <div><label data-i18n="w_f_guests">Nombre d'invités</label><input type="number" min="1"></div>
+    <div class="full"><label data-i18n="w_f_msg">Message</label><textarea></textarea></div>
+    <div class="full"><button type="submit" class="btn btn-brass" data-i18n="w_f_submit">Envoyer la demande</button></div>
+  </form>
+  <div class="success-box" id="weddingSuccess" data-i18n="w_success">Merci ! Votre demande a été reçue (démonstration) — notre équipe vous contactera normalement sous 48h.</div>
+</section>
+
+<!-- GALLERY -->
+<section class="page" id="page-gallery">
+  <div class="section-head">
+    <div class="kicker" data-i18n="g_kicker">GALERIE</div>
+    <h2 data-i18n="g_h">Le parcours, en images</h2>
+    <p data-i18n="g_p">Emplacements réservés pour les photographies réelles du club — pins centenaires, terrasse, chalet et vue sur le lac.</p>
+  </div>
+  <div class="gallery-grid" id="galleryGrid"></div>
+</section>
+
+<!-- CONTACT -->
+<section class="page" id="page-contact">
+  <div class="section-head">
+    <div class="kicker" data-i18n="c_kicker">CONTACT</div>
+    <h2 data-i18n="c_h">Nous joindre</h2>
+  </div>
+  <div class="contact-grid">
+    <div>
+      <div class="contact-item"><b data-i18n="c_addr">ADRESSE</b>345, rue St-Michel, Oka, Québec, J0N 1E0</div>
+      <div class="contact-item"><b data-i18n="c_tel">TÉLÉPHONE</b>450 479-8267</div>
+      <div class="contact-item"><b data-i18n="c_mail">COURRIEL</b>info@club-de-golf-oka.com</div>
+      <div class="contact-item"><b data-i18n="c_hours">SAISON</b><span data-i18n="c_hours_v">1er mai – 31 octobre 2026</span></div>
+    </div>
+    <svg viewBox="0 0 400 260" style="border-radius:6px;">
+      <rect width="400" height="260" fill="#E8E0C8"/>
+      <rect y="180" width="400" height="80" fill="#8FB9CC"/>
+      <polygon points="0,180 60,60 120,180" fill="#3E624A"/>
+      <polygon points="90,180 150,40 210,180" fill="#2E4E3A"/>
+      <polygon points="260,180 320,55 380,180" fill="#3E624A"/>
+      <circle cx="200" cy="150" r="8" fill="#9C6B26"/>
+      <text x="200" y="140" text-anchor="middle" font-family="Georgia,serif" font-size="12" fill="#20241C" data-i18n="c_map">345, St-Michel, Oka</text>
+    </svg>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="logo">Golf d'Oka</div>
+      <p style="max-width:32ch;margin-top:10px;" data-i18n="foot_p">345, rue St-Michel, Oka, Québec, J0N 1E0 · 450 479-8267</p>
+    </div>
+    <div>
+      <p style="margin:0;font-size:.85rem;" data-i18n="foot_l1">© 2026 Club de Golf d'Oka. Tous droits réservés.</p>
+      <p style="margin:0;font-size:.85rem;" data-i18n="foot_l2">Venez jouer sur le plus beau 9 trous du Québec.</p>
+    </div>
+  </div>
+  <div class="footer-inner fine">
+    <span data-i18n="foot_fine">Ceci est une maquette de démonstration. Aucune réservation, paiement ou courriel n'est traité réellement.</span>
+  </div>
+</footer>
+
+<!-- PAYMENT MODAL -->
+<div class="modal-bg" id="payModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div id="modalStepForm">
+      <h3 data-i18n="pay_h">Paiement</h3>
+      <p class="note" data-i18n="pay_note">Démonstration uniquement — aucune carte n'est débitée.</p>
+      <label data-i18n="pay_name">Nom sur la carte</label>
+      <input id="payName" placeholder="Jean Tremblay">
+      <label data-i18n="pay_card">Numéro de carte</label>
+      <input id="payCard" placeholder="4242 4242 4242 4242" maxlength="19">
+      <div class="card-row">
+        <div style="flex:1;"><label data-i18n="pay_exp">Expiration</label><input id="payExp" placeholder="MM/AA" maxlength="5"></div>
+        <div style="flex:1;"><label>CVV</label><input id="payCvv" placeholder="123" maxlength="3"></div>
+      </div>
+      <button class="pay" onclick="processPayment()" data-i18n="pay_submit">Confirmer et payer</button>
+    </div>
+    <div id="modalStepPaying" style="display:none;" class="paying">
+      <div class="spinner"></div>
+      <p data-i18n="pay_processing">Traitement de la démonstration…</p>
+    </div>
+    <div id="modalStepDone" style="display:none;" class="confirm-box">
+      <div class="check">✓</div>
+      <h3 data-i18n="pay_done_h">Réservation confirmée</h3>
+      <div class="confirm-code" id="confirmCode">OKA-000000</div>
+      <p data-i18n="pay_done_p">Ceci est une démonstration visuelle du parcours de réservation complet.</p>
+      <button class="pay" style="background:var(--forest);" onclick="closeModal()" data-i18n="pay_done_btn">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- i18n ---------- */
+const i18n = {
+  fr: {
+    badge:"Aperçu de conception — démonstration, sans transactions réelles",
+    since:"CLUB ÉTABLI EN 1960",
+    nav_home:"Accueil",nav_book:"Tarifs & réservation",nav_events:"Tournois",nav_wedding:"Mariages",
+    nav_gallery:"Galerie",nav_contact:"Contact",nav_cta:"Réserver un départ",
+    hero_eyebrow:"OKA, QUÉBEC — LE LONG DU LAC DES DEUX MONTAGNES",
+    hero_title:"Un des plus beaux 9 trous du Québec",
+    hero_lead:"Un parcours normale 36 tracé parmi des pins centenaires, construit sur base de sable — l'eau n'y est jamais un problème. Une expérience différente, du premier au neuvième trou.",
+    hero_cta1:"Voir les tarifs et réserver",hero_cta2:"Organiser un événement",
+    stat1:"Année de fondation",stat2:"Normale du parcours",stat3:"Longueur du parcours",stat4:"Places au chalet pour événements",
+    intro_title:"Toute une expérience, trou après trou",
+    intro_p1:"Considéré comme l'un des plus beaux 9 trous du Québec, le Club de golf d'Oka offre un paysage extraordinaire de pins centenaires en bordure du lac des Deux Montagnes. Le parcours, construit sur une base de sable, évacue naturellement l'eau — jouable même après la pluie.",
+    intro_p2:"Le chalet accueille jusqu'à 100 personnes pour vos tournois, mariages ou réceptions. La terrasse, avec vue sur le lac, est l'endroit tout indiqué pour prolonger la journée.",
+    intro_cta:"Consulter les tarifs",
+    f1_h:"Parcours normale 36",f1_p:"9 trous jouables par des golfeurs de tous niveaux, sur un terrain sablonneux qui draine naturellement.",
+    f2_h:"Chalet & terrasse",f2_p:"Salle pour groupes jusqu'à 100 personnes, casse-croûte, boutique et terrasse avec vue sur le lac.",
+    f3_h:"Ligues & tournois",f3_p:"Ligues les mardis et jeudis soir dès 18h, et tournois corporatifs ou privés toute la saison.",
+    band_h:"Saison 2026 : du 1er mai au 31 octobre",band_p:"Réservez votre départ en quelques clics — plus besoin d'attendre l'ouverture du secrétariat.",band_cta:"Réserver maintenant",
+    book_kicker:"TARIFICATION 2026 — TAXES EN SUS",book_h:"Tarifs et réservation en ligne",
+    pc1_h:"Droits de jeu",pc1_l1:"9 trous — semaine",pc1_l2:"9 trous — fin de semaine",pc1_l3:"18 trous — semaine",pc1_l4:"18 trous — fin de semaine",pc1_l5:"Après 15h (9 trous)",
+    pc2_h:"Blocs de 10 parties",pc2_l1:"10 parties de 9 trous",pc2_l2:"10 parties de 18 trous",pc2_l3:"Aucune date d'expiration",pc2_l4:"Voiturette (9 trous)",pc2_l5:"Voiturette (18 trous)",
+    pc3_h:"Abonnements annuels",pc3_l1:"Individuel 7 jours",pc3_l2:"Individuel 5 jours",pc3_l3:"5 jours après 15h",pc3_l4:"Early Bird (avant 8h)",pc3_l5:"Casier et entreposage inclus",
+    bw_kicker:"DÉMONSTRATION",bw_h:"Réservez votre départ",bw_date:"Date",bw_players:"Nombre de joueurs",bw_holes:"Parcours",
+    bw_cart:"Ajouter voiturette électrique (+14 $/pers.)",bw_slots:"Heures de départ disponibles",
+    bw_summary:"Résumé de la réservation",bw_empty:"Sélectionnez une heure de départ.",bw_pay:"Procéder au paiement",
+    ev_kicker:"LIGUES & TOURNOIS",ev_h:"Activités de la saison 2026",ev_p:"Ligues du mardi et du jeudi dès 18h, tournois corporatifs et compétitions amicales. Inscription en ligne — démonstration.",
+    w_kicker:"CHALET & TERRASSE",w_h:"Mariages et réceptions",w_p:"Notre chalet accueille jusqu'à 100 personnes, avec une terrasse donnant sur le lac des Deux Montagnes — un cadre naturel pour votre réception.",
+    wp1_h:"Forfait Terrasse",wp1_p:"Cocktail en terrasse avec vue sur le lac, jusqu'à 60 invités.",
+    wp2_h:"Forfait Chalet complet",wp2_p:"Location exclusive du chalet et de la terrasse, jusqu'à 100 invités.",
+    wp3_h:"Forfait Tournoi + Réception",wp3_p:"Avant-midi de golf suivi d'une réception — idéal pour les groupes corporatifs.",
+    w_form_h:"Demander une soumission",w_f_name:"Nom complet",w_f_email:"Courriel",w_f_date:"Date souhaitée",w_f_guests:"Nombre d'invités",w_f_msg:"Message",w_f_submit:"Envoyer la demande",
+    w_success:"Merci ! Votre demande a été reçue (démonstration) — notre équipe vous contactera normalement sous 48h.",
+    g_kicker:"GALERIE",g_h:"Le parcours, en images",g_p:"Emplacements réservés pour les photographies réelles du club — pins centenaires, terrasse, chalet et vue sur le lac.",
+    c_kicker:"CONTACT",c_h:"Nous joindre",c_addr:"ADRESSE",c_tel:"TÉLÉPHONE",c_mail:"COURRIEL",c_hours:"SAISON",c_hours_v:"1er mai – 31 octobre 2026",c_map:"345, St-Michel, Oka",
+    foot_p:"345, rue St-Michel, Oka, Québec, J0N 1E0 · 450 479-8267",
+    foot_l1:"© 2026 Club de Golf d'Oka. Tous droits réservés.",foot_l2:"Venez jouer sur le plus beau 9 trous du Québec.",
+    foot_fine:"Ceci est une maquette de démonstration. Aucune réservation, paiement ou courriel n'est traité réellement.",
+    pay_h:"Paiement",pay_note:"Démonstration uniquement — aucune carte n'est débitée.",pay_name:"Nom sur la carte",pay_card:"Numéro de carte",pay_exp:"Expiration",
+    pay_submit:"Confirmer et payer",pay_processing:"Traitement de la démonstration…",pay_done_h:"Réservation confirmée",pay_done_p:"Ceci est une démonstration visuelle du parcours de réservation complet.",pay_done_btn:"Fermer",
+    gal:["Pins centenaires","Terrasse & vue sur le lac","Chalet principal","1er trou","9e trou","Lac des Deux Montagnes"],
+    events:[
+      {d:"14",m:"JUIN",t:"Tournoi Invitation Oka",s:"Format quatre-balles, brunch inclus"},
+      {d:"05",m:"JUIL.",t:"Ligue du mardi soir",s:"Départs dès 18h, inscription à la saison"},
+      {d:"22",m:"AOÛT",t:"Tournoi corporatif — inscriptions ouvertes",s:"Réception sur la terrasse en soirée"},
+      {d:"13",m:"SEPT.",t:"Championnat du club",s:"Deux rondes, remise des prix au chalet"}
+    ],
+    ev_register:"S'inscrire",ev_registered:"Inscription enregistrée (démonstration)"
+  },
+  en:{
+    badge:"Design preview — demonstration only, no real transactions",
+    since:"CLUB FOUNDED IN 1960",
+    nav_home:"Home",nav_book:"Rates & booking",nav_events:"Tournaments",nav_wedding:"Weddings",
+    nav_gallery:"Gallery",nav_contact:"Contact",nav_cta:"Book a tee time",
+    hero_eyebrow:"OKA, QUEBEC — ALONG LAKE OF TWO MOUNTAINS",
+    hero_title:"One of Quebec's most beautiful 9-hole courses",
+    hero_lead:"A par-36 course set among century-old pines, built on a sand base — water buildup is never an issue. A different experience from the first to the ninth hole.",
+    hero_cta1:"View rates & book",hero_cta2:"Plan an event",
+    stat1:"Year founded",stat2:"Course par",stat3:"Course length",stat4:"Clubhouse capacity for events",
+    intro_title:"A full experience, hole after hole",
+    intro_p1:"Regarded as one of the most beautiful 9-hole courses in Quebec, Club de golf d'Oka offers an extraordinary landscape of century-old pines along the Lake of Two Mountains. Built on a sand base, the course drains naturally — playable even after rain.",
+    intro_p2:"The clubhouse hosts up to 100 people for tournaments, weddings or receptions. The lakeside terrace is the perfect spot to extend the day.",
+    intro_cta:"View rates",
+    f1_h:"Par-36 course",f1_p:"9 holes playable by golfers of all skill levels, on naturally draining sandy terrain.",
+    f2_h:"Clubhouse & terrace",f2_p:"Function room for up to 100 people, snack bar, pro shop and a lakeview terrace.",
+    f3_h:"Leagues & tournaments",f3_p:"Tuesday and Thursday evening leagues from 6pm, plus corporate and private tournaments all season.",
+    band_h:"2026 season: May 1 – October 31",band_p:"Book your tee time in a few clicks — no need to wait for the office to open.",band_cta:"Book now",
+    book_kicker:"2026 RATES — TAXES EXTRA",book_h:"Rates & online booking",
+    pc1_h:"Green fees",pc1_l1:"9 holes — weekday",pc1_l2:"9 holes — weekend",pc1_l3:"18 holes — weekday",pc1_l4:"18 holes — weekend",pc1_l5:"After 3pm (9 holes)",
+    pc2_h:"10-round packs",pc2_l1:"10 rounds of 9 holes",pc2_l2:"10 rounds of 18 holes",pc2_l3:"No expiry date",pc2_l4:"Cart (9 holes)",pc2_l5:"Cart (18 holes)",
+    pc3_h:"Annual memberships",pc3_l1:"Individual, 7 days",pc3_l2:"Individual, 5 days",pc3_l3:"5 days, after 3pm",pc3_l4:"Early Bird (before 8am)",pc3_l5:"Locker & storage included",
+    bw_kicker:"DEMONSTRATION",bw_h:"Book your tee time",bw_date:"Date",bw_players:"Number of players",bw_holes:"Course",
+    bw_cart:"Add electric cart (+$14/person)",bw_slots:"Available tee times",
+    bw_summary:"Booking summary",bw_empty:"Select a tee time.",bw_pay:"Proceed to payment",
+    ev_kicker:"LEAGUES & TOURNAMENTS",ev_h:"2026 season activities",ev_p:"Tuesday and Thursday leagues from 6pm, corporate tournaments and friendly competitions. Online sign-up — demonstration.",
+    w_kicker:"CLUBHOUSE & TERRACE",w_h:"Weddings & receptions",w_p:"Our clubhouse hosts up to 100 people, with a terrace overlooking the Lake of Two Mountains — a natural setting for your reception.",
+    wp1_h:"Terrace package",wp1_p:"Terrace cocktail with lake view, up to 60 guests.",
+    wp2_h:"Full clubhouse package",wp2_p:"Exclusive rental of the clubhouse and terrace, up to 100 guests.",
+    wp3_h:"Tournament + reception package",wp3_p:"Morning of golf followed by a reception — ideal for corporate groups.",
+    w_form_h:"Request a quote",w_f_name:"Full name",w_f_email:"Email",w_f_date:"Preferred date",w_f_guests:"Number of guests",w_f_msg:"Message",w_f_submit:"Send request",
+    w_success:"Thank you! Your request has been received (demonstration) — our team would normally reply within 48h.",
+    g_kicker:"GALLERY",g_h:"The course, in pictures",g_p:"Placeholders reserved for real club photography — century-old pines, terrace, clubhouse and lake view.",
+    c_kicker:"CONTACT",c_h:"Get in touch",c_addr:"ADDRESS",c_tel:"PHONE",c_mail:"EMAIL",c_hours:"SEASON",c_hours_v:"May 1 – October 31, 2026",c_map:"345 St-Michel, Oka",
+    foot_p:"345 St-Michel, Oka, Quebec, J0N 1E0 · 450 479-8267",
+    foot_l1:"© 2026 Club de Golf d'Oka. All rights reserved.",foot_l2:"Come play the most beautiful 9 holes in Quebec.",
+    foot_fine:"This is a demonstration mockup. No booking, payment or email is actually processed.",
+    pay_h:"Payment",pay_note:"Demonstration only — no card is charged.",pay_name:"Name on card",pay_card:"Card number",pay_exp:"Expiry",
+    pay_submit:"Confirm & pay",pay_processing:"Processing demonstration…",pay_done_h:"Booking confirmed",pay_done_p:"This is a visual demonstration of the full booking flow.",pay_done_btn:"Close",
+    gal:["Century-old pines","Terrace & lake view","Main clubhouse","1st hole","9th hole","Lake of Two Mountains"],
+    events:[
+      {d:"14",m:"JUN",t:"Oka Invitational",s:"Four-ball format, brunch included"},
+      {d:"05",m:"JUL",t:"Tuesday evening league",s:"Tee off from 6pm, season sign-up"},
+      {d:"22",m:"AUG",t:"Corporate tournament — open registration",s:"Evening reception on the terrace"},
+      {d:"13",m:"SEP",t:"Club championship",s:"Two rounds, awards at the clubhouse"}
+    ],
+    ev_register:"Sign up",ev_registered:"Sign-up recorded (demonstration)"
+  }
+};
+let lang = 'fr';
+
+function applyLang(){
+  const dict = i18n[lang];
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.getAttribute('data-i18n');
+    if(dict[key] !== undefined) el.textContent = dict[key];
+  });
+  buildGallery();
+  buildEvents();
+}
+function setLang(l){
+  lang = l;
+  document.getElementById('langFr').classList.toggle('active', l==='fr');
+  document.getElementById('langEn').classList.toggle('active', l==='en');
+  applyLang();
+}
+
+/* ---------- Nav ---------- */
+function goTo(page){
+  document.querySelectorAll('section.page').forEach(s=>s.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('nav.links button[data-page]').forEach(b=>b.classList.toggle('active', b.dataset.page===page));
+  document.querySelector('nav.links').classList.remove('open');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ---------- Gallery ---------- */
+const gColors = ['#22422F','#3C6E8F','#3E624A','#14261C','#2A4E64','#1E3B2C'];
+function buildGallery(){
+  const grid = document.getElementById('galleryGrid');
+  grid.innerHTML = '';
+  i18n[lang].gal.forEach((label,i)=>{
+    const d = document.createElement('div');
+    d.className = 'gph';
+    d.style.background = `linear-gradient(160deg, ${gColors[i%gColors.length]}, #C7A768)`;
+    d.innerHTML = `<span>${label}</span>`;
+    grid.appendChild(d);
+  });
+}
+
+/* ---------- Events ---------- */
+function buildEvents(){
+  const wrap = document.getElementById('eventList');
+  wrap.innerHTML = '';
+  i18n[lang].events.forEach(ev=>{
+    const row = document.createElement('div');
+    row.className='event-row';
+    row.innerHTML = `
+      <div class="event-date"><b>${ev.d}</b>${ev.m}</div>
+      <div class="event-meta event-info"><h4>${ev.t}</h4><p>${ev.s}</p></div>
+      <button class="btn btn-brass" style="padding:9px 16px;font-size:.85rem;">${i18n[lang].ev_register}</button>
+    `;
+    row.querySelector('button').onclick = function(){
+      this.textContent = i18n[lang].ev_registered;
+      this.disabled = true;
+      this.style.opacity = .6;
+    };
+    wrap.appendChild(row);
+  });
+}
+
+/* ---------- Booking widget ---------- */
+let selectedSlot = null;
+function buildSlots(){
+  const grid = document.getElementById('slotGrid');
+  grid.innerHTML = '';
+  const times = [];
+  for(let h=7; h<=17; h++){
+    times.push(`${String(h).padStart(2,'0')}:00`);
+    times.push(`${String(h).padStart(2,'0')}:20`);
+    times.push(`${String(h).padStart(2,'0')}:40`);
+  }
+  times.forEach(t=>{
+    const taken = Math.random() < 0.28;
+    const el = document.createElement('div');
+    el.className = 'slot' + (taken ? ' taken':'');
+    el.textContent = t;
+    if(!taken){
+      el.onclick = ()=>{
+        document.querySelectorAll('.slot.selected').forEach(s=>s.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedSlot = t;
+        updateCart();
+      };
+    }
+    grid.appendChild(el);
+  });
+}
+function updateCart(){
+  const linesEl = document.getElementById('cartLines');
+  const btn = document.getElementById('checkoutBtn');
+  if(!selectedSlot){
+    linesEl.innerHTML = `<div class="cart-empty">${i18n[lang].bw_empty}</div>`;
+    btn.disabled = true;
+    return;
+  }
+  const players = parseInt(document.getElementById('bwPlayers').value,10);
+  const holesPrice = parseInt(document.getElementById('bwHoles').value,10);
+  const hasCart = document.getElementById('bwCart').checked;
+  const cartUnit = holesPrice === 36 ? 18 : 14;
+  const date = document.getElementById('bwDate').value || '—';
+  const greenTotal = holesPrice * players;
+  const cartTotal = hasCart ? cartUnit * players : 0;
+  const total = greenTotal + cartTotal;
+  linesEl.innerHTML = `
+    <div class="cart-line"><span>${date} — ${selectedSlot}</span><span>${players} pers.</span></div>
+    <div class="cart-line"><span>${i18n[lang].pc1_h}</span><span>${greenTotal} $</span></div>
+    ${hasCart ? `<div class="cart-line"><span>${i18n[lang].bw_cart.split('(')[0]}</span><span>${cartTotal} $</span></div>`:''}
+    <div class="cart-total"><span>Total</span><span>${total} $</span></div>
+  `;
+  window.currentTotal = total;
+  btn.disabled = false;
+}
+['bwPlayers','bwHoles','bwCart','bwDate'].forEach(id=>{
+  document.addEventListener('DOMContentLoaded', ()=>{
+    document.getElementById(id).addEventListener('change', updateCart);
+  });
+});
+
+/* ---------- Payment modal ---------- */
+function openPayModal(){
+  document.getElementById('payModal').classList.add('open');
+  document.getElementById('modalStepForm').style.display='block';
+  document.getElementById('modalStepPaying').style.display='none';
+  document.getElementById('modalStepDone').style.display='none';
+}
+function closeModal(){
+  document.getElementById('payModal').classList.remove('open');
+}
+function processPayment(){
+  document.getElementById('modalStepForm').style.display='none';
+  document.getElementById('modalStepPaying').style.display='block';
+  setTimeout(()=>{
+    document.getElementById('modalStepPaying').style.display='none';
+    document.getElementById('modalStepDone').style.display='block';
+    const code = 'OKA-'+Math.floor(100000+Math.random()*899999);
+    document.getElementById('confirmCode').textContent = code;
+  }, 1400);
+}
+document.addEventListener('DOMContentLoaded', ()=>{
+  document.getElementById('payCard').addEventListener('input', function(e){
+    let v = e.target.value.replace(/\D/g,'').slice(0,16);
+    e.target.value = v.replace(/(.{4})/g,'$1 ').trim();
+  });
+  document.getElementById('payExp').addEventListener('input', function(e){
+    let v = e.target.value.replace(/\D/g,'').slice(0,4);
+    if(v.length>=3) v = v.slice(0,2)+'/'+v.slice(2);
+    e.target.value = v;
+  });
+});
+
+/* ---------- Forms ---------- */
+function submitForm(e, boxId){
+  e.preventDefault();
+  document.getElementById(boxId).style.display = 'block';
+  e.target.reset();
+}
+
+/* ---------- Init ---------- */
+document.addEventListener('DOMContentLoaded', ()=>{
+  buildSlots();
+  buildGallery();
+  buildEvents();
+  updateCart();
+  const dateInput = document.getElementById('bwDate');
+  const today = new Date();
+  dateInput.min = today.toISOString().slice(0,10);
+  dateInput.value = today.toISOString().slice(0,10);
+});
+</script>
+
+</body>
+</html>

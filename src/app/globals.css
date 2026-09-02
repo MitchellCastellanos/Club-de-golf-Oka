@@ -1,36 +1,56 @@
 @import "tailwindcss";
 
 /*
- * TOKENS PLACEHOLDER — Fase 0
- * Las 3 maquetas HTML (golf-oka-maqueta.html, golf-oka-emails.html,
- * golf-oka-admin.html) que segun el plan ejecutivo son la fuente de verdad
- * del diseno no estaban disponibles en el repo ni adjuntas a esta sesion.
- * Los valores de abajo son un punto de partida razonable (verde de golf +
- * dorado, tipografia de sistema) y NO fueron extraidos de las maquetas.
- * Reemplazar por los tokens reales en cuanto se compartan los 3 archivos.
+ * Tokens de diseno extraidos de las 3 maquetas HTML (design/mockups/), que
+ * comparten exactamente la misma paleta y tipografia. Ver tambien
+ * src/lib/theme.ts (mismos valores, para uso fuera de CSS, p.ej. React
+ * Email en Fase 3).
  */
 :root {
-  --background: #ffffff;
-  --foreground: #14261e;
+  --color-forest-deep: #14261c;
+  --color-forest: #1e3b2c;
+  --color-forest-light: #3e624a;
+  --color-lake: #3c6e8f;
+  --color-lake-light: #8fb9cc;
+  --color-sand: #c7a768;
+  --color-sand-light: #e4d5a8;
+  --color-paper: #f3efe1;
+  --color-paper-dark: #e8e0c8;
+  --color-ink: #20241c;
+  --color-ink-soft: #4b5245;
+  --color-brass: #9c6b26;
+  --color-white: #ffffff;
+  --color-red: #a9432f;
+  --color-green-ok: #3e624a;
 
-  --color-primary: #1f4d3a;
-  --color-primary-dark: #143427;
-  --color-accent: #c9a24b;
-  --color-neutral-50: #f7f6f2;
-  --color-neutral-900: #14261e;
+  --background: var(--color-paper);
+  --foreground: var(--color-ink);
 
-  --font-sans: var(--font-geist-sans);
+  --font-serif: Georgia, "Iowan Old Style", "Palatino Linotype",
+    "Times New Roman", serif;
+  --font-sans: var(--font-geist-sans), "Segoe UI", system-ui, -apple-system,
+    "Helvetica Neue", Arial, sans-serif;
   --font-mono: var(--font-geist-mono);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-primary: var(--color-primary);
-  --color-primary-dark: var(--color-primary-dark);
-  --color-accent: var(--color-accent);
-  --color-neutral-50: var(--color-neutral-50);
-  --color-neutral-900: var(--color-neutral-900);
+  --color-forest-deep: var(--color-forest-deep);
+  --color-forest: var(--color-forest);
+  --color-forest-light: var(--color-forest-light);
+  --color-lake: var(--color-lake);
+  --color-lake-light: var(--color-lake-light);
+  --color-sand: var(--color-sand);
+  --color-sand-light: var(--color-sand-light);
+  --color-paper: var(--color-paper);
+  --color-paper-dark: var(--color-paper-dark);
+  --color-ink: var(--color-ink);
+  --color-ink-soft: var(--color-ink-soft);
+  --color-brass: var(--color-brass);
+  --color-red: var(--color-red);
+  --color-green-ok: var(--color-green-ok);
+  --font-serif: var(--font-serif);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
 }
@@ -38,5 +58,5 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
 }

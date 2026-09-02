@@ -3,9 +3,7 @@
 Aplicacion real (Next.js + Supabase) para el Club de Golf d'Oka, construida a
 partir del plan ejecutivo "de maqueta a producto real".
 
-## Estado — Fase 0
-
-Scaffolding inicial del proyecto:
+## Estado — Fase 0 (completa)
 
 - Next.js (App Router, TypeScript, Tailwind CSS v4) en `src/`.
 - Cliente de Supabase (`src/lib/supabase/client.ts` para browser,
@@ -15,15 +13,14 @@ Scaffolding inicial del proyecto:
   members, gift_cards, tournaments, tournament_signups, wedding_inquiries,
   subscribers, users, price_settings), con RLS habilitado (sin policies aun;
   se definen en fases posteriores segun cada tabla).
-
-**Pendiente / bloqueado:** el plan ejecutivo indica que el sistema de diseno
-(colores, tipografias, componentes) debe extraerse de 3 maquetas HTML
-(`golf-oka-maqueta.html`, `golf-oka-emails.html`, `golf-oka-admin.html`), que
-son la fuente de verdad visual. Esos archivos no estan en el repositorio ni
-fueron adjuntados todavia. Los tokens en `src/app/globals.css` son un
-placeholder (verde de golf + dorado) y deben reemplazarse por los valores
-reales en cuanto se compartan las maquetas — ver el comentario al inicio de
-ese archivo.
+- Las 3 maquetas HTML (fuente de verdad visual) viven en `design/mockups/`:
+  `golf-oka-maqueta.html` (sitio publico), `golf-oka-emails.html` (correos)
+  y `golf-oka-admin.html` (panel admin). Los tres comparten exactamente la
+  misma paleta y tipografia.
+- Sistema de diseno compartido extraido de las maquetas: `src/lib/theme.ts`
+  (tokens en TypeScript, para reusar en React Email en Fase 3) y
+  `src/app/globals.css` (los mismos tokens como variables CSS / Tailwind
+  v4 `@theme`). No se modifico ningun valor visual de las maquetas.
 
 ## Desarrollo local
 
@@ -45,11 +42,14 @@ supabase db push
 
 ## Proximos pasos (segun el plan ejecutivo)
 
-1. Reemplazar los tokens de diseno placeholder por los extraidos de las 3
-   maquetas HTML.
-2. Fase 1: reconstruir el sitio publico, calendario de reservas real, i18n
-   FR/EN.
-3. Fase 2: integracion de pagos (procesador aun por decidir — ver plan,
+1. Fase 1: reconstruir el sitio publico a partir de
+   `design/mockups/golf-oka-maqueta.html`, calendario de reservas real
+   conectado a `tee_slots`, i18n FR/EN real (next-intl o similar).
+2. Fase 2: integracion de pagos (procesador aun por decidir — ver plan,
    seccion 2).
-4. Fase 3: correos transaccionales (proveedor aun por decidir).
-5. Fase 4: panel administrativo con autenticacion y roles.
+3. Fase 3: correos transaccionales — migrar
+   `design/mockups/golf-oka-emails.html` a componentes de React Email
+   usando `src/lib/theme.ts` (proveedor de correo aun por decidir).
+4. Fase 4: panel administrativo a partir de
+   `design/mockups/golf-oka-admin.html`, con autenticacion (Supabase Auth)
+   y roles (gerencia / recepcion / boutique).

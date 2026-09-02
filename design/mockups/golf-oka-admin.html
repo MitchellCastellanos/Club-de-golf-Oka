@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Golf d'Oka — Administration</title>
+<style>
+  :root{
+    --forest-deep:#14261C; --forest:#1E3B2C; --forest-light:#3E624A;
+    --lake:#3C6E8F; --sand:#C7A768; --sand-light:#E4D5A8;
+    --paper:#F3EFE1; --paper-dark:#E8E0C8; --ink:#20241C; --ink-soft:#4B5245;
+    --brass:#9C6B26; --white:#FFFFFF; --red:#A9432F; --green-ok:#3E624A;
+    --serif: Georgia,'Iowan Old Style','Palatino Linotype','Times New Roman',serif;
+    --sans:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:var(--sans);background:#EEF0E9;color:var(--ink);}
+  a{color:inherit;text-decoration:none;}
+
+  .badge{position:fixed;bottom:14px;right:14px;z-index:99;background:var(--forest-deep);color:var(--paper);font-size:.72rem;padding:8px 12px;border-radius:3px;box-shadow:0 4px 14px rgba(0,0,0,.25);opacity:.92;}
+
+  .app{display:grid;grid-template-columns:236px 1fr;min-height:100vh;}
+  @media(max-width:900px){.app{grid-template-columns:1fr;}.sidebar{display:none;}}
+
+  .sidebar{background:var(--forest-deep);color:var(--paper);padding:22px 14px;position:sticky;top:0;height:100vh;overflow-y:auto;}
+  .sidebar .logo{font-family:var(--serif);font-size:1.15rem;padding:0 10px 22px;}
+  .sidebar .logo span{display:block;font-size:.6rem;color:var(--sand-light);letter-spacing:.05em;margin-top:2px;font-family:var(--sans);}
+  .nav-group{margin-bottom:18px;}
+  .nav-group .glabel{font-size:.68rem;color:#7f8a76;padding:0 10px 6px;letter-spacing:.04em;}
+  .nav-item{
+    display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:5px;
+    font-size:.87rem;cursor:pointer;color:var(--paper-dark);
+  }
+  .nav-item:hover{background:rgba(255,255,255,.06);}
+  .nav-item.active{background:var(--forest);color:var(--white);}
+  .nav-item .dot{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.5;flex-shrink:0;}
+  .nav-item.active .dot{background:var(--sand);opacity:1;}
+
+  .main{padding:0;}
+  .topbar{
+    background:var(--white);border-bottom:1px solid var(--paper-dark);
+    padding:16px 30px;display:flex;justify-content:space-between;align-items:center;
+  }
+  .topbar h2{font-family:var(--serif);margin:0;font-size:1.3rem;color:var(--forest-deep);}
+  .topbar .who{font-size:.82rem;color:var(--ink-soft);display:flex;align-items:center;gap:10px;}
+  .avatar{width:30px;height:30px;border-radius:50%;background:var(--brass);color:var(--white);display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;}
+
+  .content{padding:26px 30px 60px;}
+  .view{display:none;}
+  .view.active{display:block;}
+
+  /* KPI cards */
+  .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:26px;}
+  @media(max-width:820px){.kpi-row{grid-template-columns:repeat(2,1fr);}}
+  .kpi{background:var(--white);border:1px solid var(--paper-dark);border-radius:6px;padding:18px 20px;}
+  .kpi .label{font-size:.76rem;color:var(--ink-soft);margin-bottom:6px;}
+  .kpi .val{font-family:var(--serif);font-size:1.7rem;color:var(--forest-deep);}
+  .kpi .delta{font-size:.76rem;margin-top:4px;}
+  .delta.up{color:var(--green-ok);} .delta.down{color:var(--red);}
+
+  .panel{background:var(--white);border:1px solid var(--paper-dark);border-radius:6px;padding:22px;margin-bottom:22px;}
+  .panel h3{font-family:var(--serif);font-size:1.08rem;margin:0 0 4px;color:var(--forest-deep);}
+  .panel .sub{font-size:.82rem;color:var(--ink-soft);margin-bottom:16px;}
+  .panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;}
+
+  table{width:100%;border-collapse:collapse;font-size:.86rem;}
+  th{text-align:left;font-size:.72rem;color:var(--ink-soft);text-transform:none;padding:8px 10px;border-bottom:2px solid var(--paper-dark);letter-spacing:.02em;}
+  td{padding:11px 10px;border-bottom:1px solid var(--paper-dark);}
+  tr:last-child td{border-bottom:none;}
+  .tag{display:inline-block;padding:3px 9px;border-radius:20px;font-size:.72rem;font-weight:600;}
+  .tag.ok{background:#E7EFE4;color:var(--green-ok);}
+  .tag.pending{background:#F4EBD6;color:var(--brass);}
+  .tag.cancel{background:#F5E4DF;color:var(--red);}
+  .rowbtn{background:transparent;border:1px solid var(--paper-dark);border-radius:4px;padding:5px 10px;font-size:.76rem;cursor:pointer;color:var(--forest);margin-right:4px;}
+  .rowbtn:hover{background:var(--paper);}
+  .rowbtn.danger{color:var(--red);border-color:#eecfc6;}
+
+  .btn{padding:10px 18px;border-radius:4px;font-size:.86rem;font-weight:600;border:none;cursor:pointer;}
+  .btn-brass{background:var(--brass);color:var(--white);}
+  .btn-ghost{background:transparent;border:1px solid var(--paper-dark);color:var(--ink);}
+
+  /* price editor */
+  .price-edit-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--paper-dark);}
+  .price-edit-row:last-child{border-bottom:none;}
+  .price-edit-row .lbl{font-size:.88rem;}
+  .price-edit-row .inp-wrap{display:flex;align-items:center;gap:6px;}
+  .price-edit-row input{width:90px;padding:8px 10px;border:1px solid var(--paper-dark);border-radius:4px;font-size:.9rem;text-align:right;background:var(--paper);}
+  .save-toast{display:none;background:#E7EFE4;color:var(--green-ok);border:1px solid #cfe0c9;padding:10px 14px;border-radius:4px;font-size:.82rem;margin-top:14px;}
+
+  /* pipeline */
+  .pipeline{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+  @media(max-width:900px){.pipeline{grid-template-columns:1fr 1fr;}}
+  .stage{background:var(--paper);border-radius:6px;padding:12px;min-height:120px;}
+  .stage h4{font-size:.8rem;color:var(--ink-soft);margin:0 0 10px;display:flex;justify-content:space-between;}
+  .stage h4 b{color:var(--forest-deep);}
+  .card{background:var(--white);border:1px solid var(--paper-dark);border-radius:5px;padding:11px 12px;margin-bottom:9px;font-size:.82rem;}
+  .card b{display:block;color:var(--forest-deep);margin-bottom:2px;}
+  .card .meta{color:var(--ink-soft);font-size:.76rem;}
+
+  .toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+  .toolbar input,.toolbar select{padding:9px 12px;border:1px solid var(--paper-dark);border-radius:4px;font-size:.85rem;background:var(--white);}
+
+  .subscriber-stat{display:flex;gap:26px;margin-bottom:18px;flex-wrap:wrap;}
+  .subscriber-stat div{font-size:.8rem;color:var(--ink-soft);}
+  .subscriber-stat b{display:block;font-family:var(--serif);font-size:1.4rem;color:var(--forest-deep);}
+
+  .two-col{display:grid;grid-template-columns:1.3fr 1fr;gap:22px;}
+  @media(max-width:900px){.two-col{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div class="badge">Aperçu de conception — démonstration, données fictives</div>
+
+<div class="app">
+  <div class="sidebar">
+    <div class="logo">Golf d'Oka <span>ADMINISTRATION</span></div>
+
+    <div class="nav-group">
+      <div class="glabel">VUE D'ENSEMBLE</div>
+      <div class="nav-item active" data-view="dashboard" onclick="showView('dashboard',this)"><span class="dot"></span>Tableau de bord</div>
+    </div>
+    <div class="nav-group">
+      <div class="glabel">OPÉRATIONS</div>
+      <div class="nav-item" data-view="bookings" onclick="showView('bookings',this)"><span class="dot"></span>Réservations</div>
+      <div class="nav-item" data-view="pricing" onclick="showView('pricing',this)"><span class="dot"></span>Tarifs &amp; produits</div>
+      <div class="nav-item" data-view="members" onclick="showView('members',this)"><span class="dot"></span>Socios &amp; abonos</div>
+      <div class="nav-item" data-view="shop" onclick="showView('shop',this)"><span class="dot"></span>Boutique / cartes-cadeaux</div>
+    </div>
+    <div class="nav-group">
+      <div class="glabel">ÉVÉNEMENTS</div>
+      <div class="nav-item" data-view="tournaments" onclick="showView('tournaments',this)"><span class="dot"></span>Tournois &amp; ligues</div>
+      <div class="nav-item" data-view="weddings" onclick="showView('weddings',this)"><span class="dot"></span>Mariages / événements</div>
+    </div>
+    <div class="nav-group">
+      <div class="glabel">MARKETING</div>
+      <div class="nav-item" data-view="newsletter" onclick="showView('newsletter',this)"><span class="dot"></span>Infolettre</div>
+      <div class="nav-item" data-view="gallery" onclick="showView('gallery',this)"><span class="dot"></span>Galerie</div>
+    </div>
+    <div class="nav-group">
+      <div class="glabel">GESTION</div>
+      <div class="nav-item" data-view="reports" onclick="showView('reports',this)"><span class="dot"></span>Rapports</div>
+      <div class="nav-item" data-view="settings" onclick="showView('settings',this)"><span class="dot"></span>Utilisateurs &amp; accès</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <h2 id="viewTitle">Tableau de bord</h2>
+      <div class="who"><div class="avatar">MC</div> Marie-Claude · Gérante</div>
+    </div>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div class="view active" id="view-dashboard">
+        <div class="kpi-row">
+          <div class="kpi"><div class="label">Réservations aujourd'hui</div><div class="val">18</div><div class="delta up">+4 vs mardi dernier</div></div>
+          <div class="kpi"><div class="label">Revenu du mois</div><div class="val">28 640 $</div><div class="delta up">+12 % vs juin 2025</div></div>
+          <div class="kpi"><div class="label">Occupation du tee sheet</div><div class="val">71 %</div><div class="delta down">-5 % vs semaine dernière</div></div>
+          <div class="kpi"><div class="label">Demandes de mariage en attente</div><div class="val">3</div><div class="delta up">2 nouvelles cette semaine</div></div>
+        </div>
+
+        <div class="two-col">
+          <div class="panel">
+            <h3>Prochains départs</h3>
+            <div class="sub">Aujourd'hui, 14 juin 2026</div>
+            <table>
+              <tr><th>Heure</th><th>Client</th><th>Joueurs</th><th>Parcours</th><th>Statut</th></tr>
+              <tr><td>10:20</td><td>J. Tremblay</td><td>4</td><td>18 trous</td><td><span class="tag ok">Confirmé</span></td></tr>
+              <tr><td>10:40</td><td>Ligue du mardi</td><td>8</td><td>9 trous</td><td><span class="tag ok">Confirmé</span></td></tr>
+              <tr><td>11:00</td><td>S. Bergeron</td><td>2</td><td>18 trous</td><td><span class="tag pending">En attente paiement</span></td></tr>
+              <tr><td>13:20</td><td>Groupe corporatif — ABC inc.</td><td>12</td><td>9 trous</td><td><span class="tag ok">Confirmé</span></td></tr>
+            </table>
+          </div>
+          <div class="panel">
+            <h3>Alertes</h3>
+            <div class="sub">Ce qui demande une action</div>
+            <table>
+              <tr><td>Demande de mariage — 20 sept.<br><span style="color:var(--ink-soft);font-size:.78rem;">85 invités, en attente de réponse</span></td></tr>
+              <tr><td>Paiement en attente — S. Bergeron<br><span style="color:var(--ink-soft);font-size:.78rem;">Réservation 11:00 aujourd'hui</span></td></tr>
+              <tr><td>Stock cartes-cadeaux bas<br><span style="color:var(--ink-soft);font-size:.78rem;">4 restantes sur le lot imprimé</span></td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOOKINGS -->
+      <div class="view" id="view-bookings">
+        <div class="toolbar">
+          <input type="date" value="2026-06-14">
+          <select><option>Tous les parcours</option><option>9 trous</option><option>18 trous</option></select>
+          <select><option>Tous les statuts</option><option>Confirmé</option><option>En attente</option><option>Annulé</option></select>
+          <button class="btn btn-brass" style="margin-left:auto;">+ Bloquer une plage horaire</button>
+        </div>
+        <div class="panel">
+          <table>
+            <tr><th>Heure</th><th>Client</th><th>Joueurs</th><th>Parcours</th><th>Voiturette</th><th>Montant</th><th>Statut</th><th></th></tr>
+            <tr><td>08:00</td><td>R. Gagnon</td><td>2</td><td>18 trous</td><td>Oui</td><td>108 $</td><td><span class="tag ok">Confirmé</span></td><td><button class="rowbtn">Modifier</button><button class="rowbtn danger">Annuler</button></td></tr>
+            <tr><td>10:20</td><td>J. Tremblay</td><td>4</td><td>18 trous</td><td>Oui</td><td>184 $</td><td><span class="tag ok">Confirmé</span></td><td><button class="rowbtn">Modifier</button><button class="rowbtn danger">Annuler</button></td></tr>
+            <tr><td>10:40</td><td>Ligue du mardi</td><td>8</td><td>9 trous</td><td>Non</td><td>224 $</td><td><span class="tag ok">Confirmé</span></td><td><button class="rowbtn">Modifier</button><button class="rowbtn danger">Annuler</button></td></tr>
+            <tr><td>11:00</td><td>S. Bergeron</td><td>2</td><td>18 trous</td><td>Non</td><td>72 $</td><td><span class="tag pending">En attente</span></td><td><button class="rowbtn">Relancer</button><button class="rowbtn danger">Annuler</button></td></tr>
+            <tr><td>13:20</td><td>Groupe ABC inc.</td><td>12</td><td>9 trous</td><td>Oui</td><td>504 $</td><td><span class="tag ok">Confirmé</span></td><td><button class="rowbtn">Modifier</button><button class="rowbtn danger">Annuler</button></td></tr>
+            <tr><td>15:40</td><td>P. Nadeau</td><td>1</td><td>9 trous</td><td>Non</td><td>20 $</td><td><span class="tag cancel">Annulé</span></td><td><button class="rowbtn">Rembourser</button></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- PRICING -->
+      <div class="view" id="view-pricing">
+        <div class="two-col">
+          <div class="panel">
+            <h3>Droits de jeu</h3>
+            <div class="sub">Modifiez les tarifs affichés sur le site en temps réel</div>
+            <div class="price-edit-row"><span class="lbl">9 trous — semaine</span><div class="inp-wrap"><span>$</span><input value="28.00"></div></div>
+            <div class="price-edit-row"><span class="lbl">9 trous — fin de semaine</span><div class="inp-wrap"><span>$</span><input value="30.00"></div></div>
+            <div class="price-edit-row"><span class="lbl">18 trous — semaine</span><div class="inp-wrap"><span>$</span><input value="36.00"></div></div>
+            <div class="price-edit-row"><span class="lbl">18 trous — fin de semaine</span><div class="inp-wrap"><span>$</span><input value="40.00"></div></div>
+            <div class="price-edit-row"><span class="lbl">Après 15h (9 trous)</span><div class="inp-wrap"><span>$</span><input value="20.00"></div></div>
+            <button class="btn btn-brass" onclick="document.getElementById('saveToast1').style.display='block'">Enregistrer les changements</button>
+            <div class="save-toast" id="saveToast1">✓ Tarifs mis à jour — visibles sur le site immédiatement.</div>
+          </div>
+          <div class="panel">
+            <h3>Abonnements annuels</h3>
+            <div class="sub">Prix et disponibilité</div>
+            <div class="price-edit-row"><span class="lbl">Individuel 7 jours</span><div class="inp-wrap"><span>$</span><input value="1250.00"></div></div>
+            <div class="price-edit-row"><span class="lbl">Individuel 5 jours</span><div class="inp-wrap"><span>$</span><input value="1200.00"></div></div>
+            <div class="price-edit-row"><span class="lbl">5 jours après 15h</span><div class="inp-wrap"><span>$</span><input value="650.00"></div></div>
+            <div class="price-edit-row"><span class="lbl">Early Bird</span><div class="inp-wrap"><span>$</span><input value="500.00"></div></div>
+            <button class="btn btn-brass" onclick="document.getElementById('saveToast2').style.display='block'">Enregistrer les changements</button>
+            <div class="save-toast" id="saveToast2">✓ Abonnements mis à jour.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MEMBERS -->
+      <div class="view" id="view-members">
+        <div class="toolbar">
+          <input placeholder="Rechercher un membre...">
+          <select><option>Tous les types</option><option>7 jours</option><option>5 jours</option><option>Early Bird</option></select>
+          <button class="btn btn-brass" style="margin-left:auto;">+ Ajouter un membre</button>
+        </div>
+        <div class="panel">
+          <table>
+            <tr><th>Nom</th><th>Type d'abonnement</th><th>Depuis</th><th>Renouvellement</th><th>Statut</th><th></th></tr>
+            <tr><td>Robert Gagnon</td><td>Individuel 7 jours</td><td>2019</td><td>1 mai 2027</td><td><span class="tag ok">Actif</span></td><td><button class="rowbtn">Voir</button></td></tr>
+            <tr><td>Lucie Bélanger</td><td>Individuel 5 jours</td><td>2021</td><td>1 mai 2027</td><td><span class="tag ok">Actif</span></td><td><button class="rowbtn">Voir</button></td></tr>
+            <tr><td>Marc-André Roy</td><td>Early Bird</td><td>2024</td><td>1 mai 2027</td><td><span class="tag pending">Renouvellement dû</span></td><td><button class="rowbtn">Relancer</button></td></tr>
+            <tr><td>Ginette Cormier</td><td>5 jours après 15h</td><td>2016</td><td>1 mai 2027</td><td><span class="tag ok">Actif</span></td><td><button class="rowbtn">Voir</button></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- SHOP -->
+      <div class="view" id="view-shop">
+        <div class="kpi-row">
+          <div class="kpi"><div class="label">Cartes-cadeaux vendues (juin)</div><div class="val">22</div></div>
+          <div class="kpi"><div class="label">Revenu cartes-cadeaux</div><div class="val">1 840 $</div></div>
+          <div class="kpi"><div class="label">Blocs de 10 parties vendus</div><div class="val">9</div></div>
+          <div class="kpi"><div class="label">Non encore utilisées</div><div class="val">14</div></div>
+        </div>
+        <div class="panel">
+          <h3>Cartes-cadeaux émises</h3>
+          <table>
+            <tr><th>Code</th><th>Valeur</th><th>Acheté par</th><th>Date</th><th>Statut</th></tr>
+            <tr><td>OKA-GC-3312</td><td>100 $</td><td>C. Fortin</td><td>2 juin 2026</td><td><span class="tag ok">Actif</span></td></tr>
+            <tr><td>OKA-GC-3311</td><td>50 $</td><td>D. Simard</td><td>28 mai 2026</td><td><span class="tag cancel">Utilisé</span></td></tr>
+            <tr><td>OKA-GC-3310</td><td>200 $</td><td>Entreprise Larivée</td><td>25 mai 2026</td><td><span class="tag ok">Actif</span></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- TOURNAMENTS -->
+      <div class="view" id="view-tournaments">
+        <div class="panel-head" style="margin-bottom:16px;">
+          <div><h3 style="margin:0;">Tournois &amp; ligues</h3><div class="sub" style="margin:4px 0 0;">Créez un événement, suivez les inscriptions</div></div>
+          <button class="btn btn-brass">+ Nouveau tournoi</button>
+        </div>
+        <div class="panel">
+          <table>
+            <tr><th>Événement</th><th>Date</th><th>Inscrits</th><th>Capacité</th><th>Statut</th><th></th></tr>
+            <tr><td>Tournoi Invitation Oka</td><td>14 juin 2026</td><td>44</td><td>60</td><td><span class="tag ok">Ouvert</span></td><td><button class="rowbtn">Voir inscrits</button></td></tr>
+            <tr><td>Ligue du mardi soir</td><td>Récurrent</td><td>28</td><td>32</td><td><span class="tag ok">Ouvert</span></td><td><button class="rowbtn">Voir inscrits</button></td></tr>
+            <tr><td>Tournoi corporatif — Groupe ABC</td><td>22 août 2026</td><td>12</td><td>48</td><td><span class="tag pending">Inscriptions en cours</span></td><td><button class="rowbtn">Voir inscrits</button></td></tr>
+            <tr><td>Championnat du club</td><td>13 sept. 2026</td><td>0</td><td>80</td><td><span class="tag pending">Pas encore ouvert</span></td><td><button class="rowbtn">Ouvrir les inscriptions</button></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- WEDDINGS -->
+      <div class="view" id="view-weddings">
+        <div class="panel-head" style="margin-bottom:16px;">
+          <div><h3 style="margin:0;">Mariages &amp; événements</h3><div class="sub" style="margin:4px 0 0;">Suivi des demandes reçues depuis le site</div></div>
+        </div>
+        <div class="pipeline">
+          <div class="stage"><h4>Nouvelle demande <b>2</b></h4>
+            <div class="card"><b>Marie Dubois</b><span class="meta">20 sept. · 85 invités</span></div>
+            <div class="card"><b>Éric Lavoie</b><span class="meta">4 juil. · 40 invités</span></div>
+          </div>
+          <div class="stage"><h4>Contacté <b>1</b></h4>
+            <div class="card"><b>Alexandra Roy</b><span class="meta">12 août · 100 invités</span></div>
+          </div>
+          <div class="stage"><h4>Soumission envoyée <b>1</b></h4>
+            <div class="card"><b>Nicolas Perron</b><span class="meta">30 mai 2027 · 60 invités</span></div>
+          </div>
+          <div class="stage"><h4>Confirmé <b>3</b></h4>
+            <div class="card"><b>Julie Michaud</b><span class="meta">15 juin 2026 · Forfait chalet complet</span></div>
+            <div class="card"><b>Groupe Lavigne</b><span class="meta">3 sept. 2026 · Forfait terrasse</span></div>
+            <div class="card"><b>Sophie Ouellet</b><span class="meta">8 oct. 2026 · Tournoi + réception</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEWSLETTER -->
+      <div class="view" id="view-newsletter">
+        <div class="subscriber-stat">
+          <div><b>1 842</b>Abonnés actifs</div>
+          <div><b>+38</b>Nouveaux ce mois-ci</div>
+          <div><b>4</b>Désinscriptions ce mois-ci</div>
+          <div><b>42 %</b>Taux d'ouverture moyen</div>
+        </div>
+        <div class="two-col">
+          <div class="panel">
+            <h3>Abonnés récents</h3>
+            <table>
+              <tr><th>Courriel</th><th>Inscrit le</th><th>Source</th></tr>
+              <tr><td>c.fortin@courriel.com</td><td>2 juin 2026</td><td>Achat carte-cadeau</td></tr>
+              <tr><td>lucie.b@courriel.com</td><td>29 mai 2026</td><td>Page d'accueil</td></tr>
+              <tr><td>eric.lavoie@courriel.com</td><td>27 mai 2026</td><td>Demande de mariage</td></tr>
+            </table>
+          </div>
+          <div class="panel">
+            <h3>Rédiger un envoi</h3>
+            <div class="sub">Utilise les gabarits de courriel de la marque</div>
+            <select style="width:100%;padding:9px 12px;border:1px solid var(--paper-dark);border-radius:4px;margin-bottom:12px;">
+              <option>Promotion — Rabais fin de saison</option>
+              <option>Annonce — Ouverture des inscriptions tournoi</option>
+              <option>Infolettre mensuelle</option>
+            </select>
+            <button class="btn btn-brass" style="width:100%;">Aperçu et envoi</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- GALLERY -->
+      <div class="view" id="view-gallery">
+        <div class="panel-head" style="margin-bottom:16px;">
+          <div><h3 style="margin:0;">Galerie du site</h3><div class="sub" style="margin:4px 0 0;">Gérez les photos affichées sur la page publique</div></div>
+          <button class="btn btn-brass">+ Téléverser des photos</button>
+        </div>
+        <div class="panel">
+          <p style="color:var(--ink-soft);font-size:.88rem;">6 photos actuellement en ligne · dernière mise à jour : espace réservé pour les vraies photographies du club (pins centenaires, terrasse, chalet, trous 1 et 9, vue sur le lac).</p>
+        </div>
+      </div>
+
+      <!-- REPORTS -->
+      <div class="view" id="view-reports">
+        <div class="kpi-row">
+          <div class="kpi"><div class="label">Revenu — Green fees</div><div class="val">16 240 $</div></div>
+          <div class="kpi"><div class="label">Revenu — Abonnements</div><div class="val">8 100 $</div></div>
+          <div class="kpi"><div class="label">Revenu — Événements</div><div class="val">3 400 $</div></div>
+          <div class="kpi"><div class="label">Revenu — Boutique</div><div class="val">900 $</div></div>
+        </div>
+        <div class="panel">
+          <h3>Comparaison annuelle</h3>
+          <div class="sub">Juin 2026 vs juin 2025</div>
+          <table>
+            <tr><th>Catégorie</th><th>2025</th><th>2026</th><th>Variation</th></tr>
+            <tr><td>Green fees</td><td>14 100 $</td><td>16 240 $</td><td style="color:var(--green-ok);">+15 %</td></tr>
+            <tr><td>Abonnements</td><td>7 600 $</td><td>8 100 $</td><td style="color:var(--green-ok);">+7 %</td></tr>
+            <tr><td>Événements (mariages/tournois)</td><td>2 100 $</td><td>3 400 $</td><td style="color:var(--green-ok);">+62 %</td></tr>
+            <tr><td>Boutique / cartes-cadeaux</td><td>640 $</td><td>900 $</td><td style="color:var(--green-ok);">+41 %</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="view" id="view-settings">
+        <div class="panel">
+          <h3>Utilisateurs</h3>
+          <div class="sub">Qui a accès à quoi</div>
+          <table>
+            <tr><th>Nom</th><th>Rôle</th><th>Accès</th></tr>
+            <tr><td>Marie-Claude Simard</td><td>Gérante</td><td>Accès complet</td></tr>
+            <tr><td>Jean Bouchard</td><td>Réception</td><td>Réservations, membres</td></tr>
+            <tr><td>Boutique — comptoir</td><td>Employé boutique</td><td>Réservations du jour, cartes-cadeaux</td></tr>
+          </table>
+        </div>
+        <div class="panel">
+          <h3>Informations du club</h3>
+          <div class="price-edit-row"><span class="lbl">Adresse</span><span style="font-size:.86rem;">345, rue St-Michel, Oka, J0N 1E0</span></div>
+          <div class="price-edit-row"><span class="lbl">Téléphone</span><span style="font-size:.86rem;">450 479-8267</span></div>
+          <div class="price-edit-row"><span class="lbl">Saison</span><span style="font-size:.86rem;">1 mai – 31 octobre 2026</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const titles = {
+  dashboard:"Tableau de bord", bookings:"Réservations", pricing:"Tarifs & produits",
+  members:"Socios & abonos", shop:"Boutique / cartes-cadeaux", tournaments:"Tournois & ligues",
+  weddings:"Mariages / événements", newsletter:"Infolettre", gallery:"Galerie",
+  reports:"Rapports", settings:"Utilisateurs & accès"
+};
+function showView(id, el){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('viewTitle').textContent = titles[id];
+}
+</script>
+</body>
+</html>

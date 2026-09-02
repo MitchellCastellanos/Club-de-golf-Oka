@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Golf d'Oka — Système de courriels</title>
+<style>
+  :root{
+    --forest-deep:#14261C; --forest:#1E3B2C; --forest-light:#3E624A;
+    --lake:#3C6E8F; --sand:#C7A768; --sand-light:#E4D5A8;
+    --paper:#F3EFE1; --paper-dark:#E8E0C8; --ink:#20241C; --ink-soft:#4B5245;
+    --brass:#9C6B26; --white:#FFFFFF;
+    --serif: Georgia,'Iowan Old Style','Palatino Linotype','Times New Roman',serif;
+    --sans:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:var(--sans);background:var(--paper);color:var(--ink);}
+  header{background:var(--forest-deep);color:var(--paper);padding:0 5vw;}
+  .nav-inner{max-width:1300px;margin:0 auto;height:68px;display:flex;align-items:center;justify-content:space-between;}
+  .logo{font-family:var(--serif);font-size:1.2rem;}
+  .logo span{display:block;font-family:var(--sans);font-size:.6rem;color:var(--sand-light);letter-spacing:.05em;}
+  .lang-toggle{display:flex;border:1px solid rgba(255,255,255,.3);border-radius:20px;overflow:hidden;}
+  .lang-toggle button{background:transparent;color:var(--paper);border:none;padding:6px 12px;font-size:.74rem;font-weight:600;cursor:pointer;}
+  .lang-toggle button.active{background:var(--sand);color:var(--forest-deep);}
+  .badge{position:fixed;bottom:14px;right:14px;z-index:99;background:var(--forest-deep);color:var(--paper);font-size:.72rem;padding:8px 12px;border-radius:3px;box-shadow:0 4px 14px rgba(0,0,0,.25);opacity:.92;}
+
+  main{max-width:1300px;margin:0 auto;padding:38px 5vw 80px;}
+  .intro{max-width:70ch;margin-bottom:30px;}
+  .intro h1{font-family:var(--serif);font-size:1.9rem;margin:0 0 .3em;color:var(--forest-deep);}
+  .intro p{color:var(--ink-soft);margin:0;}
+
+  .layout{display:grid;grid-template-columns:280px 1fr;gap:28px;align-items:start;}
+  @media(max-width:880px){.layout{grid-template-columns:1fr;}}
+
+  .sidebar{background:var(--white);border:1px solid var(--paper-dark);border-radius:6px;padding:8px;position:sticky;top:20px;}
+  .group-label{font-size:.72rem;font-weight:700;color:var(--brass);padding:12px 12px 6px;letter-spacing:.02em;}
+  .tpl-btn{
+    display:block;width:100%;text-align:left;background:transparent;border:none;
+    padding:10px 12px;border-radius:4px;font-size:.86rem;color:var(--ink);cursor:pointer;
+  }
+  .tpl-btn:hover{background:var(--paper);}
+  .tpl-btn.active{background:var(--forest);color:var(--white);}
+  .tpl-btn small{display:block;font-size:.72rem;color:var(--ink-soft);margin-top:2px;}
+  .tpl-btn.active small{color:var(--sand-light);}
+
+  .preview-col{min-width:0;}
+  .mail-chrome{background:var(--white);border:1px solid var(--paper-dark);border-radius:8px;overflow:hidden;box-shadow:0 6px 24px rgba(20,38,28,.08);}
+  .mail-bar{padding:16px 20px;border-bottom:1px solid var(--paper-dark);}
+  .mail-bar .row{display:flex;font-size:.84rem;padding:2px 0;}
+  .mail-bar .row b{width:56px;color:var(--ink-soft);font-weight:600;flex-shrink:0;}
+  .mail-bar .subject{font-size:1.02rem;font-weight:700;color:var(--forest-deep);margin-top:4px;}
+  .mail-frame-wrap{background:#DADFD5;padding:24px;}
+  iframe{width:100%;border:none;background:var(--white);border-radius:4px;min-height:640px;}
+
+  .legal-note{max-width:70ch;margin-top:24px;font-size:.82rem;color:var(--ink-soft);border-top:1px solid var(--paper-dark);padding-top:16px;}
+</style>
+</head>
+<body>
+
+<div class="badge" data-i18n="badge">Aperçu de conception — démonstration, aucun courriel n'est réellement envoyé</div>
+
+<header>
+  <div class="nav-inner">
+    <div class="logo">Golf d'Oka <span data-i18n="tag">SYSTÈME DE COURRIELS AUTOMATISÉS</span></div>
+    <div class="lang-toggle">
+      <button id="langFr" class="active" onclick="setLang('fr')">FR</button>
+      <button id="langEn" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="intro">
+    <h1 data-i18n="h1">Gabarits de courriels automatisés</h1>
+    <p data-i18n="p1">Chaque action du client — inscription à l'infolettre, réservation, achat, changement — déclenche automatiquement un courriel à l'image du club. Cliquez sur un gabarit pour le prévisualiser tel qu'il apparaîtrait dans la boîte de réception d'un client.</p>
+  </div>
+
+  <div class="layout">
+    <div class="sidebar" id="sidebar"></div>
+    <div class="preview-col">
+      <div class="mail-chrome">
+        <div class="mail-bar">
+          <div class="row"><b data-i18n="lbl_from">De :</b><span id="mFrom"></span></div>
+          <div class="row"><b data-i18n="lbl_to">À :</b><span id="mTo"></span></div>
+          <div class="subject" id="mSubject"></div>
+        </div>
+        <div class="mail-frame-wrap">
+          <iframe id="mailFrame" title="preview"></iframe>
+        </div>
+      </div>
+      <div class="legal-note" data-i18n="legal">Chaque courriel commercial inclut, comme l'exige la Loi canadienne anti-pourriel (LCAP) : l'adresse postale du club, un lien de désinscription en un clic, et l'identité claire de l'expéditeur.</div>
+    </div>
+  </div>
+</main>
+
+<script>
+const dict = {
+  fr:{
+    badge:"Aperçu de conception — démonstration, aucun courriel n'est réellement envoyé",
+    tag:"SYSTÈME DE COURRIELS AUTOMATISÉS",
+    h1:"Gabarits de courriels automatisés",
+    p1:"Chaque action du client — inscription à l'infolettre, réservation, achat, changement — déclenche automatiquement un courriel à l'image du club. Cliquez sur un gabarit pour le prévisualiser tel qu'il apparaîtrait dans la boîte de réception d'un client.",
+    lbl_from:"De :", lbl_to:"À :",
+    legal:"Chaque courriel commercial inclut, comme l'exige la Loi canadienne anti-pourriel (LCAP) : l'adresse postale du club, un lien de désinscription en un clic, et l'identité claire de l'expéditeur.",
+    groups:[
+      {label:"INFOLETTRE", items:["welcome","unsub"]},
+      {label:"RÉSERVATIONS", items:["bookConfirm","bookChange","bookCancel","bookReminder"]},
+      {label:"ACHATS", items:["receipt"]},
+      {label:"ÉVÉNEMENTS", items:["weddingRequest"]}
+    ],
+    templates:{
+      welcome:{name:"Bienvenue à l'infolettre", desc:"Après inscription", from:"Club de Golf d'Oka <info@club-de-golf-oka.com>", to:"jean.tremblay@courriel.com",
+        subject:"Bienvenue dans la famille du Golf d'Oka !",
+        h:"Bienvenue !", body:"Merci de vous être inscrit à l'infolettre du Club de Golf d'Oka. Vous recevrez en primeur nos promotions de saison, les dates de tournois et les places disponibles pour les mariages et réceptions.",
+        cta:"Voir les tarifs 2026", note:"Vous recevez ce courriel car vous vous êtes inscrit sur club-de-golf-oka.com."},
+      unsub:{name:"Confirmation de désinscription", desc:"Après retrait de la liste", from:"Club de Golf d'Oka <info@club-de-golf-oka.com>", to:"jean.tremblay@courriel.com",
+        subject:"Vous avez été désinscrit de l'infolettre",
+        h:"C'est fait.", body:"Vous ne recevrez plus nos courriels promotionnels. Vous continuerez toutefois de recevoir les courriels liés à vos réservations et achats en cours, s'il y a lieu.",
+        cta:"Se réinscrire", note:"Changement d'avis ? Vous pouvez vous réinscrire en tout temps depuis notre site."},
+      bookConfirm:{name:"Confirmation de réservation", desc:"Départ confirmé", from:"Réservations — Golf d'Oka <reservations@club-de-golf-oka.com>", to:"jean.tremblay@courriel.com",
+        subject:"Votre départ du 14 juin à 10h20 est confirmé",
+        h:"Réservation confirmée", body:"Votre partie est confirmée. Voici le détail :", details:[["Date","Dimanche 14 juin 2026"],["Heure de départ","10h20"],["Parcours","18 trous"],["Joueurs","4"],["Voiturette","Oui (4x)"],["Confirmation","OKA-482913"],["Total payé","184,00 $"]],
+        cta:"Gérer ma réservation", note:"Présentez-vous 15 minutes avant votre départ à la boutique."},
+      bookChange:{name:"Modification de réservation", desc:"Heure ou date changée", from:"Réservations — Golf d'Oka <reservations@club-de-golf-oka.com>", to:"jean.tremblay@courriel.com",
+        subject:"Votre réservation a été modifiée",
+        h:"Réservation mise à jour", body:"Votre réservation OKA-482913 a été modifiée avec succès. Voici les nouveaux détails :", details:[["Nouvelle date","Dimanche 14 juin 2026"],["Nouvelle heure","13h00"],["Parcours","18 trous"],["Joueurs","4"]],
+        cta:"Voir ma réservation", note:"Aucun frais n'a été appliqué pour ce changement."},
+      bookCancel:{name:"Annulation de réservation", desc:"Départ annulé", from:"Réservations — Golf d'Oka <reservations@club-de-golf-oka.com>", to:"jean.tremblay@courriel.com",
+        subject:"Votre réservation du 14 juin a été annulée",
+        h:"Réservation annulée", body:"Comme demandé, votre réservation OKA-482913 a été annulée. Si un montant a été payé, le remboursement sera traité selon notre politique.", details:[["Réservation annulée","OKA-482913"],["Montant remboursé","184,00 $"],["Délai de traitement","3 à 5 jours ouvrables"]],
+        cta:"Réserver un nouveau départ", note:"Une question sur votre remboursement ? Répondez à ce courriel."},
+      bookReminder:{name:"Rappel de départ", desc:"24h avant la partie", from:"Golf d'Oka <info@club-de-golf-oka.com>", to:"jean.tremblay@courriel.com",
+        subject:"Rappel : votre départ est demain à 10h20",
+        h:"On vous attend demain !", body:"Petit rappel amical pour votre partie de golf demain. Voici le résumé :", details:[["Date","Dimanche 14 juin 2026"],["Heure de départ","10h20"],["Joueurs","4"],["Météo prévue","Ensoleillé, 22°C"]],
+        cta:"Voir les détails", note:"Arrivée suggérée : 15 minutes avant l'heure de départ."},
+      receipt:{name:"Reçu d'achat", desc:"Abonnement ou carte-cadeau", from:"Boutique — Golf d'Oka <boutique@club-de-golf-oka.com>", to:"jean.tremblay@courriel.com",
+        subject:"Votre reçu — Abonnement annuel 7 jours",
+        h:"Merci pour votre achat", body:"Voici le reçu de votre transaction :", details:[["Article","Abonnement individuel 7 jours"],["Prix","1 250,00 $"],["Taxes","186,38 $"],["Total","1 436,38 $"],["Méthode","Visa se terminant par 4242"],["Numéro de reçu","OKA-R-118820"]],
+        cta:"Télécharger le reçu (PDF)", note:"Conservez ce courriel pour vos dossiers ou votre comptabilité."},
+      weddingRequest:{name:"Demande de soumission reçue", desc:"Mariage / réception", from:"Événements — Golf d'Oka <evenements@club-de-golf-oka.com>", to:"marie.dubois@courriel.com",
+        subject:"Nous avons bien reçu votre demande",
+        h:"Demande reçue", body:"Merci pour votre intérêt envers le Club de Golf d'Oka pour votre réception. Voici un résumé de votre demande :", details:[["Date souhaitée","20 septembre 2026"],["Nombre d'invités","85"],["Forfait","Chalet complet"]],
+        cta:"Voir nos forfaits", note:"Notre équipe d'événements vous contactera normalement sous 48 heures."}
+    }
+  },
+  en:{
+    badge:"Design preview — demonstration only, no email is actually sent",
+    tag:"AUTOMATED EMAIL SYSTEM",
+    h1:"Automated email templates",
+    p1:"Every customer action — newsletter sign-up, booking, purchase, change — automatically triggers a branded email. Click a template to preview it as it would appear in a customer's inbox.",
+    lbl_from:"From:", lbl_to:"To:",
+    legal:"As required under Canada's Anti-Spam Law (CASL), every commercial email includes the club's mailing address, a one-click unsubscribe link, and clear sender identification.",
+    groups:[
+      {label:"NEWSLETTER", items:["welcome","unsub"]},
+      {label:"BOOKINGS", items:["bookConfirm","bookChange","bookCancel","bookReminder"]},
+      {label:"PURCHASES", items:["receipt"]},
+      {label:"EVENTS", items:["weddingRequest"]}
+    ],
+    templates:{
+      welcome:{name:"Newsletter welcome", desc:"After sign-up", from:"Club de Golf d'Oka <info@club-de-golf-oka.com>", to:"jean.tremblay@email.com",
+        subject:"Welcome to the Golf d'Oka family!",
+        h:"Welcome!", body:"Thank you for subscribing to the Club de Golf d'Oka newsletter. You'll be the first to hear about seasonal promotions, tournament dates, and available dates for weddings and receptions.",
+        cta:"View 2026 rates", note:"You're receiving this email because you signed up on club-de-golf-oka.com."},
+      unsub:{name:"Unsubscribe confirmation", desc:"After opting out", from:"Club de Golf d'Oka <info@club-de-golf-oka.com>", to:"jean.tremblay@email.com",
+        subject:"You've been unsubscribed from our newsletter",
+        h:"All done.", body:"You will no longer receive our promotional emails. You'll still receive emails related to any active bookings or purchases.",
+        cta:"Resubscribe", note:"Changed your mind? You can resubscribe anytime from our website."},
+      bookConfirm:{name:"Booking confirmation", desc:"Tee time confirmed", from:"Reservations — Golf d'Oka <reservations@club-de-golf-oka.com>", to:"jean.tremblay@email.com",
+        subject:"Your June 14 tee time at 10:20am is confirmed",
+        h:"Booking confirmed", body:"Your round is confirmed. Here are the details:", details:[["Date","Sunday, June 14, 2026"],["Tee time","10:20am"],["Course","18 holes"],["Players","4"],["Cart","Yes (x4)"],["Confirmation","OKA-482913"],["Total paid","$184.00"]],
+        cta:"Manage my booking", note:"Please arrive 15 minutes before your tee time at the pro shop."},
+      bookChange:{name:"Booking change", desc:"Time or date changed", from:"Reservations — Golf d'Oka <reservations@club-de-golf-oka.com>", to:"jean.tremblay@email.com",
+        subject:"Your booking has been updated",
+        h:"Booking updated", body:"Your booking OKA-482913 has been successfully changed. New details:", details:[["New date","Sunday, June 14, 2026"],["New time","1:00pm"],["Course","18 holes"],["Players","4"]],
+        cta:"View my booking", note:"No fee was applied for this change."},
+      bookCancel:{name:"Booking cancellation", desc:"Tee time cancelled", from:"Reservations — Golf d'Oka <reservations@club-de-golf-oka.com>", to:"jean.tremblay@email.com",
+        subject:"Your June 14 booking has been cancelled",
+        h:"Booking cancelled", body:"As requested, your booking OKA-482913 has been cancelled. If a payment was made, the refund will be processed per our policy.", details:[["Cancelled booking","OKA-482913"],["Refund amount","$184.00"],["Processing time","3–5 business days"]],
+        cta:"Book a new tee time", note:"Questions about your refund? Just reply to this email."},
+      bookReminder:{name:"Tee time reminder", desc:"24h before the round", from:"Golf d'Oka <info@club-de-golf-oka.com>", to:"jean.tremblay@email.com",
+        subject:"Reminder: your tee time is tomorrow at 10:20am",
+        h:"See you tomorrow!", body:"A friendly reminder about your round tomorrow. Here's the summary:", details:[["Date","Sunday, June 14, 2026"],["Tee time","10:20am"],["Players","4"],["Forecast","Sunny, 22°C"]],
+        cta:"View details", note:"Suggested arrival: 15 minutes before your tee time."},
+      receipt:{name:"Purchase receipt", desc:"Membership or gift card", from:"Pro Shop — Golf d'Oka <boutique@club-de-golf-oka.com>", to:"jean.tremblay@email.com",
+        subject:"Your receipt — 7-day annual membership",
+        h:"Thank you for your purchase", body:"Here is your transaction receipt:", details:[["Item","Individual 7-day membership"],["Price","$1,250.00"],["Taxes","$186.38"],["Total","$1,436.38"],["Method","Visa ending in 4242"],["Receipt number","OKA-R-118820"]],
+        cta:"Download receipt (PDF)", note:"Keep this email for your records or accounting."},
+      weddingRequest:{name:"Quote request received", desc:"Wedding / reception", from:"Events — Golf d'Oka <evenements@club-de-golf-oka.com>", to:"marie.dubois@email.com",
+        subject:"We've received your request",
+        h:"Request received", body:"Thank you for your interest in Club de Golf d'Oka for your reception. Here's a summary of your request:", details:[["Preferred date","September 20, 2026"],["Number of guests","85"],["Package","Full clubhouse"]],
+        cta:"View our packages", note:"Our events team will normally reach out within 48 hours."}
+    }
+  }
+};
+let lang='fr', activeTpl='welcome';
+
+function emailHTML(t){
+  const rowsHTML = (t.details||[]).map(([k,v])=>`
+    <tr>
+      <td style="padding:9px 0;border-bottom:1px solid #E8E0C8;font-size:13px;color:#4B5245;">${k}</td>
+      <td style="padding:9px 0;border-bottom:1px solid #E8E0C8;font-size:13px;color:#14261C;font-weight:700;text-align:right;">${v}</td>
+    </tr>`).join('');
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+  <body style="margin:0;padding:0;background:#DADFD5;font-family:Segoe UI,system-ui,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#DADFD5;padding:28px 0;">
+    <tr><td align="center">
+      <table width="580" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:6px;overflow:hidden;">
+        <tr><td style="background:#14261C;padding:26px 32px;">
+          <div style="font-family:Georgia,serif;color:#F3EFE1;font-size:20px;">Golf d'Oka</div>
+          <div style="font-family:Georgia,serif;color:#C7A768;font-size:11px;letter-spacing:.04em;margin-top:2px;">${lang==='fr'?'CLUB ÉTABLI EN 1960':'CLUB FOUNDED IN 1960'}</div>
+        </td></tr>
+        <tr><td style="padding:36px 32px 8px;">
+          <h1 style="font-family:Georgia,serif;color:#14261C;font-size:22px;margin:0 0 14px;">${t.h}</h1>
+          <p style="font-size:14px;line-height:1.6;color:#4B5245;margin:0 0 18px;">${t.body}</p>
+        </td></tr>
+        ${t.details ? `<tr><td style="padding:0 32px;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background:#F3EFE1;border-radius:4px;padding:4px 16px;">${rowsHTML}</table>
+        </td></tr>` : ''}
+        <tr><td style="padding:26px 32px 8px;">
+          <a href="#" style="display:inline-block;background:#9C6B26;color:#ffffff;text-decoration:none;font-weight:700;font-size:14px;padding:13px 26px;border-radius:3px;">${t.cta}</a>
+        </td></tr>
+        <tr><td style="padding:20px 32px 32px;">
+          <p style="font-size:12px;color:#8a9186;margin:0;">${t.note}</p>
+        </td></tr>
+        <tr><td style="background:#F3EFE1;padding:22px 32px;border-top:1px solid #E8E0C8;">
+          <p style="font-size:11px;color:#8a9186;margin:0 0 6px;">Club de Golf d'Oka — 345, rue St-Michel, Oka, Québec, J0N 1E0</p>
+          <p style="font-size:11px;color:#8a9186;margin:0;">
+            <a href="#" style="color:#3C6E8F;text-decoration:underline;">${lang==='fr'?'Se désinscrire':'Unsubscribe'}</a>
+            &nbsp;·&nbsp;
+            <a href="#" style="color:#3C6E8F;text-decoration:underline;">${lang==='fr'?"Gérer mes préférences":'Manage preferences'}</a>
+          </p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+  </body></html>`;
+}
+
+function buildSidebar(){
+  const d = dict[lang];
+  const sb = document.getElementById('sidebar');
+  sb.innerHTML = '';
+  d.groups.forEach(g=>{
+    const label = document.createElement('div');
+    label.className='group-label';
+    label.textContent = g.label;
+    sb.appendChild(label);
+    g.items.forEach(key=>{
+      const t = d.templates[key];
+      const b = document.createElement('button');
+      b.className = 'tpl-btn' + (key===activeTpl?' active':'');
+      b.innerHTML = `${t.name}<small>${t.desc}</small>`;
+      b.onclick = ()=>{ activeTpl = key; render(); };
+      sb.appendChild(b);
+    });
+  });
+}
+
+function render(){
+  const d = dict[lang];
+  const t = d.templates[activeTpl];
+  document.getElementById('mFrom').textContent = t.from;
+  document.getElementById('mTo').textContent = t.to;
+  document.getElementById('mSubject').textContent = t.subject;
+  document.getElementById('mailFrame').srcdoc = emailHTML(t);
+  document.querySelectorAll('.tpl-btn').forEach((b,i)=>{});
+  buildSidebar();
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.getAttribute('data-i18n');
+    if(d[key]) el.textContent = d[key];
+  });
+}
+
+function setLang(l){
+  lang = l;
+  document.getElementById('langFr').classList.toggle('active', l==='fr');
+  document.getElementById('langEn').classList.toggle('active', l==='en');
+  render();
+}
+
+render();
+</script>
+</body>
+</html>

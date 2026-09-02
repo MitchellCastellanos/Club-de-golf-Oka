@@ -40,3 +40,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# auto-generado por el postinstall de next (agent rules), no es contenido del proyecto
+/AGENTS.md
+/CLAUDE.md

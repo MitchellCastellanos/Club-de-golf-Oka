@@ -28,9 +28,8 @@
 
   --font-serif: Georgia, "Iowan Old Style", "Palatino Linotype",
     "Times New Roman", serif;
-  --font-sans: var(--font-geist-sans), "Segoe UI", system-ui, -apple-system,
-    "Helvetica Neue", Arial, sans-serif;
-  --font-mono: var(--font-geist-mono);
+  --font-sans: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial,
+    sans-serif;
 }
 
 @theme inline {
@@ -52,7 +51,6 @@
   --color-green-ok: var(--color-green-ok);
   --font-serif: var(--font-serif);
   --font-sans: var(--font-sans);
-  --font-mono: var(--font-mono);
 }
 
 body {

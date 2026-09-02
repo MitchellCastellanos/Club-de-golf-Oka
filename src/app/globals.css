@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+/*
+ * TOKENS PLACEHOLDER — Fase 0
+ * Las 3 maquetas HTML (golf-oka-maqueta.html, golf-oka-emails.html,
+ * golf-oka-admin.html) que segun el plan ejecutivo son la fuente de verdad
+ * del diseno no estaban disponibles en el repo ni adjuntas a esta sesion.
+ * Los valores de abajo son un punto de partida razonable (verde de golf +
+ * dorado, tipografia de sistema) y NO fueron extraidos de las maquetas.
+ * Reemplazar por los tokens reales en cuanto se compartan los 3 archivos.
+ */
+:root {
+  --background: #ffffff;
+  --foreground: #14261e;
+
+  --color-primary: #1f4d3a;
+  --color-primary-dark: #143427;
+  --color-accent: #c9a24b;
+  --color-neutral-50: #f7f6f2;
+  --color-neutral-900: #14261e;
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--color-primary);
+  --color-primary-dark: var(--color-primary-dark);
+  --color-accent: var(--color-accent);
+  --color-neutral-50: var(--color-neutral-50);
+  --color-neutral-900: var(--color-neutral-900);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
